@@ -3,6 +3,7 @@ package logger
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 // A Level is a logging priority. Higher levels are more important.
@@ -48,6 +49,8 @@ func (l Level) String() string {
 // ParseLevel converts a string representation of a level to a level type.
 func ParseLevel(levelStr string) (Level, error) {
 	var l Level
+
+	levelStr = strings.ToLower(levelStr)
 
 	switch levelStr {
 	case levelDebugStr:

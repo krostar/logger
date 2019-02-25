@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,6 +32,9 @@ func TestParseLevel(t *testing.T) {
 		}, "quiet level": {
 			levelStr:      levelQuietStr,
 			expectedLevel: LevelQuiet,
+		}, "level with uppercase": {
+			levelStr:      strings.ToUpper(levelInfoStr),
+			expectedLevel: LevelInfo,
 		},
 	}
 
