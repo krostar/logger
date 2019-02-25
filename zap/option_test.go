@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
 	"github.com/krostar/logger"
@@ -53,4 +54,17 @@ func TestWithErrOutputPaths(t *testing.T) {
 	var cfg config
 	WithErrOutputPaths([]string{"yolo", "yili"})(&cfg)
 	assert.Equal(t, []string{"yolo", "yili"}, cfg.Zap.ErrorOutputPaths)
+}
+
+func TestWithZapConfig(t *testing.T) {
+	var (
+		cfg    config
+		zapCfg = zap.Config{
+			Development: true,
+		}
+	)
+
+	WithZapConfig(zapCfg)(&cfg)
+
+	assert.Equal(t, zapCfg, cfg.Zap)
 }

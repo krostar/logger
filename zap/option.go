@@ -99,3 +99,10 @@ func WithErrOutputPaths(paths []string) Option {
 		c.Zap.ErrorOutputPaths = paths
 	}
 }
+
+// WithZapConfig applies zap configuration directly into the configuration.
+func WithZapConfig(cfg zap.Config) Option {
+	return func(c *config) {
+		c.Zap = cfg
+	}
+}

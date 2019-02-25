@@ -20,7 +20,7 @@ func New(opts ...Option) (logger.Logger, func() error, error) {
 		Level: zapcore.InfoLevel,
 		Zap: zap.Config{
 			Development:       false,
-			DisableCaller:     false,
+			DisableCaller:     true,
 			DisableStacktrace: true,
 			OutputPaths:       []string{"stdout"},
 			ErrorOutputPaths:  []string{"stderr"},
