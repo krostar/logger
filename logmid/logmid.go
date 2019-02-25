@@ -7,8 +7,8 @@ import (
 	"github.com/krostar/logger"
 )
 
-// LogMid is a middleware that logs requests.
-func LogMid(log logger.Logger, opts ...Option) func(http.Handler) http.Handler {
+// New returns a middleware that log requests.
+func New(log logger.Logger, opts ...Option) func(http.Handler) http.Handler {
 	var o = Options{
 		message: "http request",
 		logAtLevel: func(r *http.Request) logger.Level {

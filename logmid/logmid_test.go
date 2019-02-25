@@ -29,7 +29,7 @@ func TestMiddleware(t *testing.T) {
 	r.Header.Set("User-Agent", "super-agent-test")
 	r.RemoteAddr = "10.11.12.13"
 
-	LogMid(log,
+	New(log,
 		WithCallback(func(r *http.Request) {
 			var ctx = r.Context()
 			AddFieldInContext(ctx, "key", "value")
