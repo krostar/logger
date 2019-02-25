@@ -51,8 +51,8 @@ func WithDefaultFields() Option {
 		if httpinfo.IsUsed(r) {
 			AddFieldInContext(ctx, "latency", httpinfo.ExecutionTime(r))
 			AddFieldInContext(ctx, "status", httpinfo.Status(r))
-			AddFieldInContext(ctx, "content-length", httpinfo.BytesWrote(r))
-			AddFieldInContext(ctx, "route", httpinfo.RouteUsed(r))
+			AddFieldInContext(ctx, "content-length", httpinfo.ContentLength(r))
+			AddFieldInContext(ctx, "route", httpinfo.Route(r))
 		}
 	})
 }
