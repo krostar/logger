@@ -17,13 +17,11 @@ func TestWithConfig(t *testing.T) {
 		Formatter: "json",
 		WithColor: false,
 		Output:    "yolo",
-		OutputErr: "yoloerr",
 	})(&cfg)
 
 	assert.Equal(t, zapcore.ErrorLevel, cfg.Level)
 	assert.Equal(t, "json", cfg.Zap.Encoding)
 	assert.Equal(t, []string{"yolo"}, cfg.Zap.OutputPaths)
-	assert.Equal(t, []string{"yoloerr"}, cfg.Zap.ErrorOutputPaths)
 }
 
 func TestWithLevel(t *testing.T) {
@@ -48,12 +46,6 @@ func TestWithOutputPaths(t *testing.T) {
 	var cfg config
 	WithOutputPaths([]string{"yolo", "yili"})(&cfg)
 	assert.Equal(t, []string{"yolo", "yili"}, cfg.Zap.OutputPaths)
-}
-
-func TestWithErrOutputPaths(t *testing.T) {
-	var cfg config
-	WithErrOutputPaths([]string{"yolo", "yili"})(&cfg)
-	assert.Equal(t, []string{"yolo", "yili"}, cfg.Zap.ErrorOutputPaths)
 }
 
 func TestWithZapConfig(t *testing.T) {

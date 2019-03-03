@@ -40,9 +40,6 @@ func WithConfig(cfg logger.Config) Option {
 	if cfg.Output != "" {
 		opts = append(opts, WithOutputPaths([]string{cfg.Output}))
 	}
-	if cfg.OutputErr != "" {
-		opts = append(opts, WithErrOutputPaths([]string{cfg.OutputErr}))
-	}
 
 	return func(c *config) {
 		for _, opt := range opts {
@@ -89,14 +86,6 @@ func WithJSONFormatter() Option {
 func WithOutputPaths(paths []string) Option {
 	return func(c *config) {
 		c.Zap.OutputPaths = paths
-	}
-}
-
-// WithErrOutputPaths configures the paths used to write error logs to.
-//   To use standart output, and error output, use stdout or stderr.
-func WithErrOutputPaths(paths []string) Option {
-	return func(c *config) {
-		c.Zap.ErrorOutputPaths = paths
 	}
 }
 

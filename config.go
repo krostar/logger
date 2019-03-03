@@ -6,7 +6,6 @@ type Config struct {
 	Formatter string `json:"formatter"  yaml:"formatter"`
 	WithColor bool   `json:"with-color" yaml:"with-color"`
 	Output    string `json:"output"     yaml:"output"`
-	OutputErr string `json:"output-err" yaml:"output-err"`
 }
 
 // SetDefault set sane default for logger's config.
@@ -15,5 +14,4 @@ func (c *Config) SetDefault() {
 	c.Formatter = "console"
 	c.WithColor = true
 	c.Output = "stdout"
-	c.OutputErr = "stderr"
 }

@@ -14,7 +14,6 @@ func TestConfig_SetDefault(t *testing.T) {
 			Formatter: "console",
 			WithColor: true,
 			Output:    "stdout",
-			OutputErr: "stderr",
 		}
 	)
 
