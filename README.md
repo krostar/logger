@@ -18,9 +18,10 @@ Well, why the last sentence should be true ?
 From that question is born this project which:
 
 -   expose a unique abstract way of logging through a unique interface
--   expose a unique standard output redirection
 -   expose a unique configuration
--   is still modulable (can use already built zap or logrus instances)
+-   expose a unique way of redirect standard output
+-   expose a unique way of writing to an io.Writer
+-   is modulable (can use already built zap or logrus instances, or any other logger)
 -   is easily mockable
 -   help to test logs
 
@@ -59,7 +60,8 @@ func main() {
     log := logrus.New(logrus.WithConfig(config))
     log.Info("i'm a logrus-based logger")
 
-    // switch to a zap-based logger with configuration
+    // as any logger keep the same interface
+    // switching to a zap-based logger with configuration is easy
     log = zap.New(zap.WithConfig(config))
     log.Info("i'm a zap-based logger")
 }
