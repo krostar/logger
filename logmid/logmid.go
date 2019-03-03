@@ -4,16 +4,16 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/krostar/httpinfo"
+
 	"github.com/krostar/logger"
 )
 
 // New returns a middleware that log requests.
 func New(log logger.Logger, opts ...Option) func(http.Handler) http.Handler {
 	var o = Options{
-		message: "http request",
-		logAtLevel: func(r *http.Request) logger.Level {
-			return logger.LevelInfo
-		},
+		message:    "http request",
+		logAtLevel: defaultLogAtLevelFunc,
 	}
 
 	for _, opt := range opts {
@@ -46,4 +46,23 @@ func New(log logger.Logger, opts ...Option) func(http.Handler) http.Handler {
 			logger.LogAtLevelFunc(requestLogger, o.logAtLevel(r))(o.message)
 		})
 	}
+}
+
+func defaultLogAtLevelFunc(r *http.Request) logger.Level {
+	var lvl logger.Level
+
+	if httpinfo.IsUsed(r) {
+		switch status := httpinfo.Status(r); {
+		case status >= 500:
+			lvl = logger.LevelError
+		case status >= 400 && status < 500:
+			lvl = logger.LevelWarn
+		default:
+			lvl = logger.LevelInfo
+		}
+	} else {
+		lvl = logger.LevelInfo
+	}
+
+	return lvl
 }

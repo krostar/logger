@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/krostar/httpinfo"
 	"github.com/krostar/logger"
 )
 
@@ -57,4 +58,66 @@ func TestMiddleware(t *testing.T) {
 	require.Len(t, log.Entries, 1)
 	assert.Equal(t, expectedFields["key"], log.Entries[0].Fields["key"])
 	assert.Equal(t, logger.LevelDebug, log.Entries[0].Level)
+}
+
+func TestDefaultLogAtLevelFunc(t *testing.T) {
+	var (
+		log   = logger.NewInMemory(logger.LevelDebug)
+		tests = map[string]struct {
+			status        int
+			expectedLevel logger.Level
+			useRecorder   bool
+		}{
+			"no recorder ok": {
+				status:        http.StatusOK,
+				expectedLevel: logger.LevelInfo,
+				useRecorder:   false,
+			},
+			"no recorder nok": {
+				status:        http.StatusInternalServerError,
+				expectedLevel: logger.LevelInfo,
+				useRecorder:   false,
+			},
+			"recorder >200<400": {
+				status:        http.StatusOK,
+				expectedLevel: logger.LevelInfo,
+				useRecorder:   true,
+			},
+			"recorder >400<500": {
+				status:        http.StatusBadRequest,
+				expectedLevel: logger.LevelWarn,
+				useRecorder:   true,
+			},
+			"recorder >500": {
+				status:        http.StatusInternalServerError,
+				expectedLevel: logger.LevelError,
+				useRecorder:   true,
+			},
+		}
+	)
+
+	for name, test := range tests {
+		var test = test
+
+		t.Run(name, func(t *testing.T) {
+			var (
+				w                 = httptest.NewRecorder()
+				r, _              = http.NewRequest("POST", "http://local/path?query", nil)
+				h    http.Handler = http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
+					rw.WriteHeader(test.status)
+				})
+			)
+
+			h = New(log)(h)
+			if test.useRecorder {
+				h = httpinfo.Record()(h)
+			}
+
+			log.Reset()
+			h.ServeHTTP(w, r)
+
+			require.Len(t, log.Entries, 1)
+			assert.Equal(t, test.expectedLevel, log.Entries[0].Level)
+		})
+	}
 }
