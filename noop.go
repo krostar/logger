@@ -1,24 +1,7 @@
 package logger
 
-import (
-	"io/ioutil"
-	"log"
-	"os"
-)
-
 // Noop defines a no-operation logger.
 type Noop struct{}
-
-// make sure we known we break the interface at compilation time
-var _ Logger = &Noop{}
-
-// RedirectStdLog implements Logger for Noop.
-func (n *Noop) RedirectStdLog(Level) (func(), error) { // nolint: unparam
-	log.SetOutput(ioutil.Discard)
-	return func() {
-		log.SetOutput(os.Stderr)
-	}, nil
-}
 
 // SetLevel implements Logger for Noop.
 func (n *Noop) SetLevel(Level) error { return nil }

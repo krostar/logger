@@ -2,10 +2,6 @@ package logger
 
 // Logger defines the way logs can be handled.
 type Logger interface {
-	// RedirectStdLog redirects standards call the log package
-	// to the current logger instance.
-	RedirectStdLog(at Level) (restore func(), err error)
-
 	// Update apply the configuration on the logger.
 	SetLevel(Level) error
 

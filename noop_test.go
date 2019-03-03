@@ -17,16 +17,20 @@ func TestNoopImplementLogger(t *testing.T) {
 func TestNoop_RedirectStdLog(t *testing.T) {
 	var nope Noop
 
-	output := CaptureOutput(func() {
+	output, err := CaptureOutput(func() {
+		oldFlags := log.Flags()
 		log.SetFlags(0)
+		defer func() {
+			log.SetFlags(oldFlags)
+		}()
 
-		restore, err := nope.RedirectStdLog(LevelDebug)
-		require.NoError(t, err)
+		restore := RedirectStdLog(&nope, LevelDebug)
 
 		log.Println("first")
 		restore()
 		log.Println("second")
 	})
+	require.NoError(t, err)
 	require.Equal(t, "second\n", output)
 }
 

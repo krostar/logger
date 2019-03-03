@@ -68,42 +68,38 @@ func TestConvertLevel(t *testing.T) {
 	}
 }
 
-func TestZap_RedirectStdLog(t *testing.T) {
-	var (
-		outputRaw      string
-		output         map[string]interface{}
-		expectedOutput = map[string]interface{}{
-			"level":  zapcore.ErrorLevel.String(),
-			"msg":    "i'm a log",
-			"stdlog": "unhandled call to standard log package",
-		}
-	)
+func TestRedirectStdLog(t *testing.T) {
+	const imalog = "imalog"
+	var expectedOutput = map[string]interface{}{
+		"level":  zapcore.ErrorLevel.String(),
+		"msg":    "i'm a log",
+		"stdlog": "unhandled call to standard log package",
+	}
 
-	// base test, we should got what we ask for
-	outputRaw = logger.CaptureOutput(func() {
-		fmt.Print("i'm a log")
+	t.Run("pilot", func(t *testing.T) {
+		outputRaw, err := logger.CaptureOutput(func() {
+			fmt.Print(imalog)
+		})
+		require.NoError(t, err)
+		assert.Equal(t, imalog, outputRaw)
 	})
-	assert.Equal(t, "i'm a log", outputRaw)
 
-	// redirect stdlog to zap
-	outputRaw = logger.CaptureOutput(func() {
-		var z = Zap{SugaredLogger: zap.NewExample().Sugar()}
+	t.Run("using zap", func(t *testing.T) {
+		// redirect stdlog to zap
+		outputRaw, err := logger.CaptureOutput(func() {
+			var z = &Zap{SugaredLogger: zap.NewExample().Sugar()}
 
-		restore, err := z.RedirectStdLog(logger.LevelError)
+			restore := logger.RedirectStdLog(z, logger.LevelError)
+			defer restore()
+
+			log.Println("i'm a log")
+		})
 		require.NoError(t, err)
 
-		defer restore()
-
-		log.Println("i'm a log")
+		var output map[string]interface{}
+		require.NoError(t, json.Unmarshal([]byte(outputRaw), &output))
+		assert.Equal(t, expectedOutput, output)
 	})
-	require.NoError(t, json.Unmarshal([]byte(outputRaw), &output))
-	assert.Equal(t, expectedOutput, output)
-
-	// restore function should restore to the base test state
-	outputRaw = logger.CaptureOutput(func() {
-		fmt.Print("i'm a log")
-	})
-	assert.Equal(t, "i'm a log", outputRaw)
 }
 
 func TestZap_SetLevel(t *testing.T) {

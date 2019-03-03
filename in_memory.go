@@ -34,11 +34,6 @@ func (n *InMemory) Reset(lvl Level) {
 	n.Level = lvl
 }
 
-// RedirectStdLog is a no-op function, for now.
-func (n *InMemory) RedirectStdLog(at Level) (func(), error) {
-	return nil, nil
-}
-
 // SetLevel implements Logger for Memory.
 func (n *InMemory) SetLevel(lvl Level) error {
 	n.Level = lvl

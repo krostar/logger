@@ -77,17 +77,6 @@ func convertLevel(level logger.Level) (zapcore.Level, error) {
 	return zapLevel, nil
 }
 
-// RedirectStdLog redirects standard logger calls to the zap's logger.
-func (l *Zap) RedirectStdLog(at logger.Level) (func(), error) {
-	zapLevel, err := convertLevel(at)
-	if err != nil {
-		return nil, errors.Wrap(err, "logger level parsing to zap level failed")
-	}
-
-	redirectLogger := l.SugaredLogger.With("stdlog", "unhandled call to standard log package").Desugar()
-	return zap.RedirectStdLogAt(redirectLogger, zapLevel)
-}
-
 // SetLevel applies a new level to a logger instance.
 func (l *Zap) SetLevel(level logger.Level) error {
 	zapLevel, err := convertLevel(level)
