@@ -4,7 +4,7 @@ package logger
 type Noop struct{}
 
 // SetLevel implements Logger for Noop.
-func (n *Noop) SetLevel(Level) error { return nil }
+func (*Noop) SetLevel(Level) error { return nil }
 
 // Debug implements Logger for Noop.
 func (*Noop) Debug(...interface{}) {}
@@ -31,10 +31,10 @@ func (*Noop) Error(...interface{}) {}
 func (*Noop) Errorf(string, ...interface{}) {}
 
 // WithField implements Logger for Noop.
-func (n *Noop) WithField(string, interface{}) Logger { return &Noop{} }
+func (*Noop) WithField(string, interface{}) Logger { return &Noop{} }
 
 // WithFields implements Logger for Noop.
-func (n *Noop) WithFields(map[string]interface{}) Logger { return &Noop{} }
+func (*Noop) WithFields(map[string]interface{}) Logger { return &Noop{} }
 
 // WithError implements Logger for Noop.
-func (n *Noop) WithError(error) Logger { return &Noop{} }
+func (*Noop) WithError(error) Logger { return &Noop{} }
