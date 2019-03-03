@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/krostar/logger"
 )
@@ -46,12 +47,14 @@ func TestMiddleware(t *testing.T) {
 	}
 
 	var actualFieldsKeys []string
-	for key := range log.Fields {
-		actualFieldsKeys = append(actualFieldsKeys, key)
+	for _, entry := range log.Entries {
+		for key := range entry.Fields {
+			actualFieldsKeys = append(actualFieldsKeys, key)
+		}
 	}
 
 	assert.ElementsMatch(t, expectedFieldsKeys, actualFieldsKeys)
-	assert.Equal(t, expectedFields["key"], log.Fields["key"])
-	assert.Len(t, log.Entries, 1)
+	require.Len(t, log.Entries, 1)
+	assert.Equal(t, expectedFields["key"], log.Entries[0].Fields["key"])
 	assert.Equal(t, logger.LevelDebug, log.Entries[0].Level)
 }

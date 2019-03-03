@@ -114,7 +114,7 @@ func TestLogAtLevelFunc(t *testing.T) {
 	for name, test := range tests {
 		var test = test
 		t.Run(name, func(t *testing.T) {
-			log.Reset(LevelDebug)
+			log.Reset()
 
 			LogAtLevelFunc(log, test.level)("log")
 
@@ -154,7 +154,7 @@ func TestLogFAtLevelFunc(t *testing.T) {
 	for name, test := range tests {
 		var test = test
 		t.Run(name, func(t *testing.T) {
-			log.Reset(LevelDebug)
+			log.Reset()
 
 			LogFAtLevelFunc(log, test.level)("log %d", 42)
 
