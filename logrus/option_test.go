@@ -11,6 +11,16 @@ import (
 )
 
 func TestWithConfig(t *testing.T) {
+	var o = options{log: logrus.New()}
+
+	WithConfig(logger.Config{
+		Verbosity: "error",
+		Formatter: "json",
+		WithColor: false,
+	})(&o)
+
+	assert.Equal(t, logrus.ErrorLevel, o.log.Level)
+	assert.IsType(t, new(logrus.JSONFormatter), o.log.Formatter)
 }
 
 func TestWithLevel(t *testing.T) {

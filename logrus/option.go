@@ -3,6 +3,7 @@ package logrus
 import (
 	"io"
 	"os"
+	"runtime"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -43,6 +44,11 @@ func WithConfig(cfg logger.Config) Option {
 			panic(errors.Wrapf(err, "unable to open/create file %q", cfg.Output))
 		}
 		opts = append(opts, WithOutput(f))
+
+		runtime.SetFinalizer(f, func(ff *os.File) {
+			ff.Sync()  // nolint: errcheck, gosec
+			ff.Close() // nolint: errcheck, gosec
+		})
 	}
 
 	return func(c *options) {
