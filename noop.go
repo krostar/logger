@@ -4,37 +4,37 @@ package logger
 type Noop struct{}
 
 // SetLevel implements Logger for Noop.
-func (*Noop) SetLevel(Level) error { return nil }
+func (Noop) SetLevel(Level) error { return nil }
 
 // Debug implements Logger for Noop.
-func (*Noop) Debug(...interface{}) {}
+func (Noop) Debug(...interface{}) {}
 
 // Debugf implements Logger for Noop.
-func (*Noop) Debugf(string, ...interface{}) {}
+func (Noop) Debugf(string, ...interface{}) {}
 
 // Info implements Logger for Noop.
-func (*Noop) Info(...interface{}) {}
+func (Noop) Info(...interface{}) {}
 
 // Infof implements Logger for Noop.
-func (*Noop) Infof(string, ...interface{}) {}
+func (Noop) Infof(string, ...interface{}) {}
 
 // Warn implements Logger for Noop.
-func (*Noop) Warn(...interface{}) {}
+func (Noop) Warn(...interface{}) {}
 
 // Warnf implements Logger for Noop.
-func (*Noop) Warnf(string, ...interface{}) {}
+func (Noop) Warnf(string, ...interface{}) {}
 
 // Error implements Logger for Noop.
-func (*Noop) Error(...interface{}) {}
+func (Noop) Error(...interface{}) {}
 
 // Errorf implements Logger for Noop.
-func (*Noop) Errorf(string, ...interface{}) {}
+func (Noop) Errorf(string, ...interface{}) {}
 
 // WithField implements Logger for Noop.
-func (*Noop) WithField(string, interface{}) Logger { return &Noop{} }
+func (Noop) WithField(string, interface{}) Logger { return Noop{} }
 
 // WithFields implements Logger for Noop.
-func (*Noop) WithFields(map[string]interface{}) Logger { return &Noop{} }
+func (Noop) WithFields(map[string]interface{}) Logger { return Noop{} }
 
 // WithError implements Logger for Noop.
-func (*Noop) WithError(error) Logger { return &Noop{} }
+func (Noop) WithError(error) Logger { return Noop{} }

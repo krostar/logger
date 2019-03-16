@@ -13,7 +13,13 @@ func TestNoopImplementLogger(t *testing.T) {
 	if _, ok := i.(Logger); !ok {
 		t.Fatalf("expected %t to implement Logger", i)
 	}
+
+	i = Noop{}
+	if _, ok := i.(Logger); !ok {
+		t.Fatalf("expected %t to implement Logger", i)
+	}
 }
+
 func TestNoop_RedirectStdLog(t *testing.T) {
 	var nope Noop
 
