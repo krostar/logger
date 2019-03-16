@@ -106,7 +106,8 @@ func TestRedirectStdLog(t *testing.T) {
 }
 
 func TestLogrus_SetLevel(t *testing.T) {
-	var log = New()
+	var log = New(WithLevel(logger.LevelDebug))
+	assert.Equal(t, logrus.DebugLevel, log.log.Level)
 
 	t.Run("nominal", func(t *testing.T) {
 		err := log.SetLevel(logger.LevelWarn)

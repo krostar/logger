@@ -26,7 +26,7 @@ func WithConfig(cfg logger.Config) Option {
 	if lvl, err := logger.ParseLevel(cfg.Verbosity); err == nil {
 		opts = append(opts, WithLevel(lvl))
 	} else {
-		panic(errors.Wrapf(err, "unable to parse level %q", cfg.Verbosity))
+		panic(errors.Wrapf(err, "unable to apply level %q", cfg.Verbosity))
 	}
 
 	// formatter

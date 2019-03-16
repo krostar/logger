@@ -1,8 +1,7 @@
 package zap
 
 import (
-	"fmt"
-
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -25,7 +24,7 @@ func WithConfig(cfg logger.Config) Option {
 	if lvl, err := logger.ParseLevel(cfg.Verbosity); err == nil {
 		opts = append(opts, WithLevel(lvl))
 	} else {
-		fmt.Println("unable to apply verbosity")
+		panic(errors.Wrapf(err, "unable to apply level %q", cfg.Verbosity))
 	}
 
 	// formatter

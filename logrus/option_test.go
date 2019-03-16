@@ -11,16 +11,41 @@ import (
 )
 
 func TestWithConfig(t *testing.T) {
-	var o = options{log: logrus.New()}
+	t.Run("success", func(t *testing.T) {
+		var o = options{log: logrus.New()}
 
-	WithConfig(logger.Config{
-		Verbosity: "error",
-		Formatter: "json",
-		WithColor: false,
-	})(&o)
+		WithConfig(logger.Config{
+			Verbosity: "error",
+			Formatter: "json",
+			WithColor: false,
+		})(&o)
 
-	assert.Equal(t, logrus.ErrorLevel, o.log.Level)
-	assert.IsType(t, new(logrus.JSONFormatter), o.log.Formatter)
+		assert.Equal(t, logrus.ErrorLevel, o.log.Level)
+		assert.IsType(t, new(logrus.JSONFormatter), o.log.Formatter)
+	})
+
+	t.Run("success with console", func(t *testing.T) {
+		var o = options{log: logrus.New()}
+
+		WithConfig(logger.Config{
+			Verbosity: "error",
+			Formatter: "console",
+			WithColor: false,
+		})(&o)
+
+		assert.Equal(t, logrus.ErrorLevel, o.log.Level)
+		assert.IsType(t, new(logrus.TextFormatter), o.log.Formatter)
+	})
+
+	t.Run("unparsable level", func(t *testing.T) {
+		var o = options{log: logrus.New()}
+
+		assert.Panics(t, func() {
+			WithConfig(logger.Config{
+				Verbosity: "boum",
+			})(&o)
+		})
+	})
 }
 
 func TestWithLevel(t *testing.T) {
@@ -31,7 +56,11 @@ func TestWithLevel(t *testing.T) {
 
 func TestWithConsoleFormatter(t *testing.T) {
 	var o = options{log: logrus.New()}
+
 	WithConsoleFormatter(true)(&o)
+	assert.IsType(t, new(logrus.TextFormatter), o.log.Formatter)
+
+	WithConsoleFormatter(false)(&o)
 	assert.IsType(t, new(logrus.TextFormatter), o.log.Formatter)
 }
 

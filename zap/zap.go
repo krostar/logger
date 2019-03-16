@@ -77,24 +77,6 @@ func convertLevel(level logger.Level) (zapcore.Level, error) {
 	return zapLevel, nil
 }
 
-// Level returns the actual level of the zap's logger.
-func (l *Zap) Level() logger.Level {
-	var lvl logger.Level
-
-	switch l.level.Level() {
-	case zapcore.DebugLevel:
-		lvl = logger.LevelDebug
-	case zapcore.InfoLevel:
-		lvl = logger.LevelInfo
-	case zapcore.WarnLevel:
-		lvl = logger.LevelWarn
-	case zapcore.ErrorLevel:
-		lvl = logger.LevelError
-	}
-
-	return lvl
-}
-
 // SetLevel applies a new level to a logger instance.
 func (l *Zap) SetLevel(level logger.Level) error {
 	zapLevel, err := convertLevel(level)
