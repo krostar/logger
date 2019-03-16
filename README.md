@@ -67,6 +67,43 @@ func main() {
 }
 ```
 
+You have a lot of code that:
+
+-   is using io.Writer or 
+-   is logging directly with standard library `log`
+-   takes a `*log.Logger` parameter
+
+There is actually few methods to help with that:
+
+```go
+func setupHTTP(addr string, logger *log.Logger) *http.Server {
+    return &http.Server{
+		Addr:     addr,
+		ErrorLog: logger,
+	}
+}
+
+func doSomethingElse(doIt func() error, errWriter io.Writer) {
+    if err := doIt(); err != nil {
+        io.WriteString(errWriter, err.String())
+    }
+}
+
+func main() {
+    var (
+        log         logger.Logger // init it the way you want (zap, logrus, ...)
+        stdlog    = logger.StdLog(log, logger.LevelError)
+        writerlog = logger.WriterLevel(log, logger.LevelError)
+    )
+
+    setupHTTP(":80", stdlog)
+
+    doSomethingElse(func()error{
+        return errors.New("bim bam boum")
+    }, stdlog)
+}
+```
+
 ## License
 
 This project is under the MIT licence, please see the LICENCE file.

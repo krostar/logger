@@ -5,6 +5,12 @@ import (
 	"os"
 )
 
+// StdLog returns a standard logger which will use
+// the provided logger internally.
+func StdLog(logger Logger, at Level) *stdlog.Logger {
+	return stdlog.New(WriterLevel(logger, at), "", 0)
+}
+
 // RedirectStdLog redirects standard logger calls to the underlying logger.
 // This is heavily inspired by zap's way of doing the same thing.
 func RedirectStdLog(l Logger, at Level) func() {

@@ -8,6 +8,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestToStdLog(t *testing.T) {
+	var (
+		log    = NewInMemory(LevelDebug)
+		stdLog = StdLog(log, LevelWarn)
+	)
+
+	stdLog.Println("Hello world")
+
+	require.Len(t, log.Entries, 1)
+	assert.Len(t, log.Entries[0].Args, 1)
+	assert.Equal(t, log.Entries[0].Args[0], "Hello world")
+}
+
 func TestRedirectStdLog(t *testing.T) {
 	const imalog = "i'm a log"
 
