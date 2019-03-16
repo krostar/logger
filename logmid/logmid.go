@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/krostar/httpinfo"
-
 	"github.com/krostar/logger"
 )
 

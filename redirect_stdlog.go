@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"log"
+	stdlog "log"
 	"os"
 )
 
@@ -9,20 +9,20 @@ import (
 // This is heavily inspired by zap's way of doing the same thing.
 func RedirectStdLog(l Logger, at Level) func() {
 	var (
-		oldFlags  = log.Flags()
-		oldPrefix = log.Prefix()
+		oldFlags  = stdlog.Flags()
+		oldPrefix = stdlog.Prefix()
 	)
-	log.SetPrefix("")
-	log.SetFlags(0)
+	stdlog.SetPrefix("")
+	stdlog.SetFlags(0)
 
-	log.SetOutput(WriterLevel(
+	stdlog.SetOutput(WriterLevel(
 		l.WithField("stdlog", "unhandled call to standard log package"),
 		at,
 	))
 
 	return func() {
-		log.SetFlags(oldFlags)
-		log.SetPrefix(oldPrefix)
-		log.SetOutput(os.Stderr)
+		stdlog.SetFlags(oldFlags)
+		stdlog.SetPrefix(oldPrefix)
+		stdlog.SetOutput(os.Stderr)
 	}
 }

@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"log"
+	stdlog "log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,22 +12,22 @@ func TestRedirectStdLog(t *testing.T) {
 	const imalog = "i'm a log"
 
 	var (
-		l       = NewInMemory(LevelDebug)
-		restore = RedirectStdLog(l, LevelError)
+		log     = NewInMemory(LevelDebug)
+		restore = RedirectStdLog(log, LevelError)
 	)
 
-	log.Println(imalog)
+	stdlog.Println(imalog)
 
-	require.Len(t, l.Entries, 1)
-	assert.Equal(t, LevelError, l.Entries[0].Level)
-	assert.Equal(t, l.Entries[0].Fields, map[string]interface{}{
+	require.Len(t, log.Entries, 1)
+	assert.Equal(t, LevelError, log.Entries[0].Level)
+	assert.Equal(t, log.Entries[0].Fields, map[string]interface{}{
 		"stdlog": "unhandled call to standard log package",
 	})
-	require.Len(t, l.Entries[0].Args, 1)
-	assert.Equal(t, imalog, l.Entries[0].Args[0])
+	require.Len(t, log.Entries[0].Args, 1)
+	assert.Equal(t, imalog, log.Entries[0].Args[0])
 
 	restore()
 
-	log.Println(imalog)
-	require.Len(t, l.Entries, 1)
+	stdlog.Println(imalog)
+	require.Len(t, log.Entries, 1)
 }

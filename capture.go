@@ -3,7 +3,7 @@ package logger
 import (
 	"bytes"
 	"io"
-	"log"
+	stdlog "log"
 	"os"
 
 	"github.com/pkg/errors"
@@ -28,12 +28,12 @@ func CaptureOutput(writeFunc func()) (string, error) {
 	defer func() { // restore stdout and stderr to the original state
 		os.Stdout = oldStdout
 		os.Stderr = oldStderr
-		log.SetOutput(os.Stderr)
+		stdlog.SetOutput(os.Stderr)
 	}()
 
 	os.Stdout = writer
 	os.Stderr = writer
-	log.SetOutput(writer)
+	stdlog.SetOutput(writer)
 
 	writeFunc()
 

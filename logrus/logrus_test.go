@@ -3,13 +3,12 @@ package logrus
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	stdlog "log"
 	"testing"
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap/zapcore"
 
 	"github.com/krostar/logger"
 )
@@ -60,12 +59,12 @@ func TestConvertLevel(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			zapLvl, err := convertLevel(test.level)
+			logrusLvl, err := convertLevel(test.level)
 			if test.expectedFailure {
 				require.Error(t, err)
 			} else {
 				assert.NoError(t, err)
-				assert.Equal(t, test.expectedLogrusLevel, zapLvl)
+				assert.Equal(t, test.expectedLogrusLevel, logrusLvl)
 			}
 		})
 	}
@@ -74,7 +73,7 @@ func TestConvertLevel(t *testing.T) {
 func TestRedirectStdLog(t *testing.T) {
 	const imalog = "imalog"
 	var expectedOutput = map[string]interface{}{
-		"level":  zapcore.ErrorLevel.String(),
+		"level":  logrus.ErrorLevel.String(),
 		"msg":    "i'm a log",
 		"stdlog": "unhandled call to standard log package",
 	}
@@ -91,12 +90,12 @@ func TestRedirectStdLog(t *testing.T) {
 		// redirect stdlog to zap
 		outputRaw, err := logger.CaptureOutput(func() {
 			var (
-				l       = newDeterministic()
-				restore = logger.RedirectStdLog(l, logger.LevelError)
+				log     = newDeterministic()
+				restore = logger.RedirectStdLog(log, logger.LevelError)
 			)
 			defer restore()
 
-			log.Println("i'm a log")
+			stdlog.Println("i'm a log")
 		})
 		require.NoError(t, err)
 
@@ -107,16 +106,16 @@ func TestRedirectStdLog(t *testing.T) {
 }
 
 func TestLogrus_SetLevel(t *testing.T) {
-	var l = New()
+	var log = New()
 
 	t.Run("nominal", func(t *testing.T) {
-		err := l.SetLevel(logger.LevelWarn)
+		err := log.SetLevel(logger.LevelWarn)
 		require.NoError(t, err)
-		assert.Equal(t, logrus.WarnLevel, l.log.Level)
+		assert.Equal(t, logrus.WarnLevel, log.log.Level)
 	})
 
 	t.Run("error", func(t *testing.T) {
-		err := l.SetLevel(logger.Level(42))
+		err := log.SetLevel(logger.Level(42))
 		require.Error(t, err)
 	})
 }

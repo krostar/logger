@@ -2,7 +2,7 @@ package logger
 
 import (
 	"errors"
-	"log"
+	stdlog "log"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -21,20 +21,20 @@ func TestNoopImplementLogger(t *testing.T) {
 }
 
 func TestNoop_RedirectStdLog(t *testing.T) {
-	var nope Noop
+	var log Noop
 
 	output, err := CaptureOutput(func() {
-		oldFlags := log.Flags()
-		log.SetFlags(0)
+		oldFlags := stdlog.Flags()
+		stdlog.SetFlags(0)
 		defer func() {
-			log.SetFlags(oldFlags)
+			stdlog.SetFlags(oldFlags)
 		}()
 
-		restore := RedirectStdLog(&nope, LevelDebug)
+		restore := RedirectStdLog(&log, LevelDebug)
 
-		log.Println("first")
+		stdlog.Println("first")
 		restore()
-		log.Println("second")
+		stdlog.Println("second")
 	})
 	require.NoError(t, err)
 	require.Equal(t, "second\n", output)

@@ -3,7 +3,7 @@ package zap
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	stdlog "log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -22,8 +22,8 @@ func TestZapImplementLogger(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	z, f, err := New()
-	assert.NotNil(t, z)
+	log, f, err := New()
+	assert.NotNil(t, log)
 	assert.NotNil(t, f)
 	assert.NoError(t, err)
 }
@@ -87,12 +87,12 @@ func TestRedirectStdLog(t *testing.T) {
 	t.Run("using zap", func(t *testing.T) {
 		// redirect stdlog to zap
 		outputRaw, err := logger.CaptureOutput(func() {
-			var z = &Zap{SugaredLogger: zap.NewExample().Sugar()}
+			var log = &Zap{SugaredLogger: zap.NewExample().Sugar()}
 
-			restore := logger.RedirectStdLog(z, logger.LevelError)
+			restore := logger.RedirectStdLog(log, logger.LevelError)
 			defer restore()
 
-			log.Println("i'm a log")
+			stdlog.Println("i'm a log")
 		})
 		require.NoError(t, err)
 
@@ -106,16 +106,16 @@ func TestZap_SetLevel(t *testing.T) {
 	var (
 		err  error
 		zLvl = zap.NewAtomicLevelAt(zapcore.InfoLevel)
-		z    = Zap{
+		log  = Zap{
 			level: &zLvl,
 		}
 	)
 
-	err = z.SetLevel(logger.LevelDebug)
+	err = log.SetLevel(logger.LevelDebug)
 	assert.NoError(t, err)
 	assert.Equal(t, zapcore.DebugLevel, zLvl.Level())
 
-	err = z.SetLevel(logger.Level(42))
+	err = log.SetLevel(logger.Level(42))
 	assert.Error(t, err)
 	assert.Equal(t, zapcore.DebugLevel, zLvl.Level())
 }
