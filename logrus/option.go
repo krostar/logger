@@ -16,7 +16,7 @@ type options struct {
 }
 
 // Option defines a function signature to update configuration.
-type Option func(*options)
+type Option func(*options) error
 
 // WithConfig takes the logger configuration and applies it.
 func WithConfig(cfg logger.Config) Option {
@@ -26,7 +26,9 @@ func WithConfig(cfg logger.Config) Option {
 	if lvl, err := logger.ParseLevel(cfg.Verbosity); err == nil {
 		opts = append(opts, WithLevel(lvl))
 	} else {
-		panic(errors.Wrapf(err, "unable to apply level %q", cfg.Verbosity))
+		return func(c *options) error {
+			return errors.Wrapf(err, "unable to apply level %q", cfg.Verbosity)
+		}
 	}
 
 	// formatter
@@ -35,13 +37,19 @@ func WithConfig(cfg logger.Config) Option {
 		opts = append(opts, WithJSONFormatter())
 	case "console":
 		opts = append(opts, WithConsoleFormatter(cfg.WithColor))
+	default:
+		return func(c *options) error {
+			return errors.Errorf("unknown formatter %s", cfg.Formatter)
+		}
 	}
 
 	// outputs
 	if cfg.Output != "" {
 		f, err := os.OpenFile(cfg.Output, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.ModePerm)
 		if err != nil {
-			panic(errors.Wrapf(err, "unable to open/create file %q", cfg.Output))
+			return func(c *options) error {
+				return errors.Wrapf(err, "unable to open/create file %q", cfg.Output)
+			}
 		}
 		opts = append(opts, WithOutput(f))
 
@@ -51,28 +59,33 @@ func WithConfig(cfg logger.Config) Option {
 		})
 	}
 
-	return func(c *options) {
+	return func(c *options) error {
 		for _, opt := range opts {
-			opt(c)
+			if err := opt(c); err != nil {
+				return err
+			}
 		}
+		return nil
 	}
 }
 
 // WithLevel configures the minimum level of the logger.
 // It can later be updated with SetLevel.
 func WithLevel(level logger.Level) Option {
-	return func(o *options) {
+	return func(o *options) error {
 		lvl, err := convertLevel(level)
-		if err == nil {
-			o.log.Level = lvl
+		if err != nil {
+			return errors.Wrap(err, "failed to convert level")
 		}
+		o.log.Level = lvl
+		return nil
 	}
 }
 
 // WithConsoleFormatter configures the format of the log output
 // to use "console" (cli) formatter.
 func WithConsoleFormatter(colored bool) Option {
-	return func(o *options) {
+	return func(o *options) error {
 		var formatter logrus.TextFormatter
 		if colored {
 			formatter.DisableColors = false
@@ -80,27 +93,31 @@ func WithConsoleFormatter(colored bool) Option {
 			formatter.DisableColors = true
 		}
 		o.log.Formatter = &formatter
+		return nil
 	}
 }
 
 // WithJSONFormatter configures the format of the log output
 // to use "json" formatter.
 func WithJSONFormatter() Option {
-	return func(o *options) {
+	return func(o *options) error {
 		o.log.Formatter = new(logrus.JSONFormatter)
+		return nil
 	}
 }
 
 // WithOutput configures the writer used to write logs to.
 func WithOutput(writer io.Writer) Option {
-	return func(o *options) {
+	return func(o *options) error {
 		o.log.Out = writer
+		return nil
 	}
 }
 
 // WithInstance set logrus logger instance.
 func WithInstance(log *logrus.Logger) Option {
-	return func(o *options) {
+	return func(o *options) error {
 		o.log = log
+		return nil
 	}
 }

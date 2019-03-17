@@ -14,7 +14,7 @@ type config struct {
 }
 
 // Option defines a function signature to update configuration.
-type Option func(*config)
+type Option func(*config) error
 
 // WithConfig takes the logger configuration and applies it.
 func WithConfig(cfg logger.Config) Option {
@@ -24,7 +24,9 @@ func WithConfig(cfg logger.Config) Option {
 	if lvl, err := logger.ParseLevel(cfg.Verbosity); err == nil {
 		opts = append(opts, WithLevel(lvl))
 	} else {
-		panic(errors.Wrapf(err, "unable to apply level %q", cfg.Verbosity))
+		return func(c *config) error {
+			return errors.Wrapf(err, "unable to apply level %q", cfg.Verbosity)
+		}
 	}
 
 	// formatter
@@ -33,6 +35,10 @@ func WithConfig(cfg logger.Config) Option {
 		opts = append(opts, WithJSONFormatter())
 	case "console":
 		opts = append(opts, WithConsoleFormatter(cfg.WithColor))
+	default:
+		return func(c *config) error {
+			return errors.Errorf("unknown formatter %s", cfg.Formatter)
+		}
 	}
 
 	// outputs
@@ -40,57 +46,66 @@ func WithConfig(cfg logger.Config) Option {
 		opts = append(opts, WithOutputPaths([]string{cfg.Output}))
 	}
 
-	return func(c *config) {
+	return func(c *config) error {
 		for _, opt := range opts {
-			opt(c)
+			if err := opt(c); err != nil {
+				return err
+			}
 		}
+		return nil
 	}
 }
 
 // WithLevel configures the minimum level of the logger.
 // It can late be updated with SetLevel.
 func WithLevel(level logger.Level) Option {
-	return func(c *config) {
+	return func(c *config) error {
 		lvl, err := convertLevel(level)
-		if err == nil {
-			c.Level = lvl
+		if err != nil {
+			return err
 		}
+		c.Level = lvl
+		return nil
 	}
 }
 
 // WithConsoleFormatter configures the format of the log output
 //   to use "console" (cli) formatter.
 func WithConsoleFormatter(colored bool) Option {
-	return func(c *config) {
+	return func(c *config) error {
 		c.Zap.Encoding = "console"
 		if colored {
 			c.Zap.EncoderConfig.EncodeLevel = zapcore.LowercaseColorLevelEncoder
 		} else {
 			c.Zap.EncoderConfig.EncodeLevel = zapcore.LowercaseLevelEncoder
 		}
+		return nil
 	}
 }
 
 // WithJSONFormatter configures the format of the log output
 //   to use "json" formatter.
 func WithJSONFormatter() Option {
-	return func(c *config) {
+	return func(c *config) error {
 		c.Zap.Encoding = "json"
 		c.Zap.EncoderConfig.EncodeLevel = zapcore.LowercaseLevelEncoder
+		return nil
 	}
 }
 
 // WithOutputPaths configures the paths used to write logs to.
 //   To use standart output, and error output, use stdout or stderr.
 func WithOutputPaths(paths []string) Option {
-	return func(c *config) {
+	return func(c *config) error {
 		c.Zap.OutputPaths = paths
+		return nil
 	}
 }
 
 // WithZapConfig applies zap configuration directly into the configuration.
 func WithZapConfig(cfg zap.Config) Option {
-	return func(c *config) {
+	return func(c *config) error {
 		c.Zap = cfg
+		return nil
 	}
 }

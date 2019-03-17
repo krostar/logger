@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -13,13 +14,14 @@ import (
 func TestWithConfig(t *testing.T) {
 	t.Run("success with json", func(t *testing.T) {
 		var cfg config
-		WithConfig(logger.Config{
+		err := WithConfig(logger.Config{
 			Verbosity: "error",
 			Formatter: "json",
 			WithColor: false,
 			Output:    "yolo",
 		})(&cfg)
 
+		require.NoError(t, err)
 		assert.Equal(t, zapcore.ErrorLevel, cfg.Level)
 		assert.Equal(t, "json", cfg.Zap.Encoding)
 		assert.Equal(t, []string{"yolo"}, cfg.Zap.OutputPaths)
@@ -27,13 +29,14 @@ func TestWithConfig(t *testing.T) {
 
 	t.Run("success with console", func(t *testing.T) {
 		var cfg config
-		WithConfig(logger.Config{
+		err := WithConfig(logger.Config{
 			Verbosity: "error",
 			Formatter: "console",
 			WithColor: false,
 			Output:    "yolo",
 		})(&cfg)
 
+		require.NoError(t, err)
 		assert.Equal(t, zapcore.ErrorLevel, cfg.Level)
 		assert.Equal(t, "console", cfg.Zap.Encoding)
 		assert.Equal(t, []string{"yolo"}, cfg.Zap.OutputPaths)
@@ -42,38 +45,52 @@ func TestWithConfig(t *testing.T) {
 	t.Run("unparsable level", func(t *testing.T) {
 		var cfg config
 
-		assert.Panics(t, func() {
-			WithConfig(logger.Config{
-				Verbosity: "boum",
-			})(&cfg)
-		})
+		err := WithConfig(logger.Config{
+			Verbosity: "boum",
+		})(&cfg)
+		require.Error(t, err)
+	})
+
+	t.Run("unknown formatter", func(t *testing.T) {
+		var cfg config
+
+		err := WithConfig(logger.Config{
+			Verbosity: "error",
+			Formatter: "boum",
+		})(&cfg)
+		require.Error(t, err)
 	})
 }
 
 func TestWithLevel(t *testing.T) {
 	var cfg config
-	WithLevel(logger.LevelError)(&cfg)
+	err := WithLevel(logger.LevelError)(&cfg)
+	require.NoError(t, err)
 	assert.Equal(t, zapcore.ErrorLevel, cfg.Level)
 }
 
 func TestWithConsoleFormatter(t *testing.T) {
 	var cfg config
 
-	WithConsoleFormatter(true)(&cfg)
+	err := WithConsoleFormatter(true)(&cfg)
+	require.NoError(t, err)
 	assert.Equal(t, "console", cfg.Zap.Encoding)
-	WithConsoleFormatter(false)(&cfg)
+	err = WithConsoleFormatter(false)(&cfg)
+	require.NoError(t, err)
 	assert.Equal(t, "console", cfg.Zap.Encoding)
 }
 
 func TestWithJSONFormatter(t *testing.T) {
 	var cfg config
-	WithJSONFormatter()(&cfg)
+	err := WithJSONFormatter()(&cfg)
+	require.NoError(t, err)
 	assert.Equal(t, "json", cfg.Zap.Encoding)
 }
 
 func TestWithOutputPaths(t *testing.T) {
 	var cfg config
-	WithOutputPaths([]string{"yolo", "yili"})(&cfg)
+	err := WithOutputPaths([]string{"yolo", "yili"})(&cfg)
+	require.NoError(t, err)
 	assert.Equal(t, []string{"yolo", "yili"}, cfg.Zap.OutputPaths)
 }
 
@@ -84,8 +101,7 @@ func TestWithZapConfig(t *testing.T) {
 			Development: true,
 		}
 	)
-
-	WithZapConfig(zapCfg)(&cfg)
-
+	err := WithZapConfig(zapCfg)(&cfg)
+	require.NoError(t, err)
 	assert.Equal(t, zapCfg, cfg.Zap)
 }

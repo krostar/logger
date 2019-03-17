@@ -43,7 +43,9 @@ func New(opts ...Option) (logger.Logger, func() error, error) {
 	}
 
 	for _, opt := range opts {
-		opt(&config)
+		if err := opt(&config); err != nil {
+			return nil, nil, errors.Wrap(err, "unable to apply config")
+		}
 	}
 
 	atomiclevel := zap.NewAtomicLevelAt(config.Level)

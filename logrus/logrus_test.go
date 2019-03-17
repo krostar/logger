@@ -14,7 +14,7 @@ import (
 )
 
 func newDeterministic() *Logrus {
-	var log = New()
+	var log, _ = New()
 
 	log.log.Formatter = &logrus.JSONFormatter{
 		DisableTimestamp: true,
@@ -28,6 +28,13 @@ func TestLogrusImplementLogger(t *testing.T) {
 	if _, ok := i.(logger.Logger); !ok {
 		t.Fatalf("expected %t to implement Logger", i)
 	}
+}
+
+func TestLogrusNew_opt_failure(t *testing.T) {
+	_, err := New(WithConfig(logger.Config{
+		Formatter: "boum",
+	}))
+	require.Error(t, err)
 }
 
 func TestConvertLevel(t *testing.T) {
@@ -106,7 +113,7 @@ func TestRedirectStdLog(t *testing.T) {
 }
 
 func TestLogrus_SetLevel(t *testing.T) {
-	var log = New(WithLevel(logger.LevelDebug))
+	var log, _ = New(WithLevel(logger.LevelDebug))
 	assert.Equal(t, logrus.DebugLevel, log.log.Level)
 
 	t.Run("nominal", func(t *testing.T) {

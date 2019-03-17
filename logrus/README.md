@@ -6,12 +6,12 @@ Using logrus instance to build a `logger.Logger`
 // there are few ways to build a logrus instance
 
 // using the logger configuration
-var log = logrus.New(
+var log, err = logrus.New(
     logrus.WithConfig(cfg logger.Config),
 )
 
 // building it directly
-var log = logrus.New(
+var log, err = logrus.New(
     logrus.WithLevel(level logger.Level),
     logrus.WithConsoleFormatter(colored bool),
     logrus.WithJSONFormatter(),
@@ -19,7 +19,7 @@ var log = logrus.New(
 )
 
 // or by giving an already built logrus instance
-var log = logrus.New(
+var log, err = logrus.New(
     logrus.WithInstance(log *logrus.Logger),
 )
 ```

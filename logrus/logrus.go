@@ -16,7 +16,7 @@ type Logrus struct {
 }
 
 // New returns a new zap instance.
-func New(opts ...Option) *Logrus {
+func New(opts ...Option) (*Logrus, error) {
 	var o options
 
 	o.log = &logrus.Logger{
@@ -27,13 +27,15 @@ func New(opts ...Option) *Logrus {
 	}
 
 	for _, opt := range opts {
-		opt(&o)
+		if err := opt(&o); err != nil {
+			return nil, errors.Wrap(err, "unable to apply config")
+		}
 	}
 
 	return &Logrus{
 		log:         o.log,
 		FieldLogger: o.log,
-	}
+	}, nil
 }
 
 func convertLevel(level logger.Level) (logrus.Level, error) {

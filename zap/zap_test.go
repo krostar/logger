@@ -26,6 +26,11 @@ func TestNew(t *testing.T) {
 	assert.NotNil(t, log)
 	assert.NotNil(t, f)
 	assert.NoError(t, err)
+
+	_, _, err = New(WithConfig(logger.Config{
+		Formatter: "boum",
+	}))
+	require.Error(t, err)
 }
 
 func TestConvertLevel(t *testing.T) {
