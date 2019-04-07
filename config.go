@@ -28,7 +28,7 @@ func (c *Config) Validate() error {
 	case "json":
 	case "console":
 	default:
-		return errors.Errorf("unknown formatter %s", f)
+		return errors.Errorf("unknown formatter %q", f)
 	}
 
 	return nil
