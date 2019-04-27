@@ -6,6 +6,7 @@ import (
 	stdlog "log"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
@@ -123,4 +124,60 @@ func TestZap_SetLevel(t *testing.T) {
 	err = log.SetLevel(logger.Level(42))
 	assert.Error(t, err)
 	assert.Equal(t, zapcore.DebugLevel, zLvl.Level())
+}
+
+func TestZap_WithField(t *testing.T) {
+	outputRaw, err := logger.CaptureOutput(func() {
+		var log = &Zap{SugaredLogger: zap.NewExample().Sugar()}
+		log.WithField("hello", "world").WithField("answer", 42).Warn("warn")
+	})
+	require.NoError(t, err)
+
+	var output map[string]interface{}
+	require.NoError(t, json.Unmarshal([]byte(outputRaw), &output))
+	assert.Equal(t, map[string]interface{}{
+		"level":  zapcore.WarnLevel.String(),
+		"msg":    "warn",
+		"hello":  "world",
+		"answer": float64(42),
+	}, output)
+}
+
+func TestZap_WithFields(t *testing.T) {
+	outputRaw, err := logger.CaptureOutput(func() {
+		var log = &Zap{SugaredLogger: zap.NewExample().Sugar()}
+		log.
+			WithFields(map[string]interface{}{"hello": "world"}).
+			WithFields(map[string]interface{}{"answer": 42}).
+			Warn("warn")
+	})
+	require.NoError(t, err)
+
+	var output map[string]interface{}
+	require.NoError(t, json.Unmarshal([]byte(outputRaw), &output))
+	assert.Equal(t, map[string]interface{}{
+		"level":  zapcore.WarnLevel.String(),
+		"msg":    "warn",
+		"hello":  "world",
+		"answer": float64(42),
+	}, output)
+}
+
+func TestZap_WithError(t *testing.T) {
+	outputRaw, err := logger.CaptureOutput(func() {
+		var log = &Zap{SugaredLogger: zap.NewExample().Sugar()}
+		log.
+			WithError(errors.New("eww1")).
+			WithError(errors.New("eww2")).
+			Warn("warn")
+	})
+	require.NoError(t, err)
+
+	var output map[string]interface{}
+	require.NoError(t, json.Unmarshal([]byte(outputRaw), &output))
+	assert.Equal(t, map[string]interface{}{
+		"level":              zapcore.WarnLevel.String(),
+		"msg":                "warn",
+		logger.FieldErrorKey: "eww2",
+	}, output)
 }

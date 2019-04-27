@@ -61,10 +61,17 @@ func TestWithConfig(t *testing.T) {
 }
 
 func TestWithLevel(t *testing.T) {
-	var o = options{log: logrus.New()}
-	err := WithLevel(logger.LevelError)(&o)
-	require.NoError(t, err)
-	assert.Equal(t, logrus.ErrorLevel, o.log.Level)
+	t.Run("success", func(t *testing.T) {
+		var o = options{log: logrus.New()}
+		err := WithLevel(logger.LevelError)(&o)
+		require.NoError(t, err)
+		assert.Equal(t, logrus.ErrorLevel, o.log.Level)
+	})
+	t.Run("fail", func(t *testing.T) {
+		var o = options{log: logrus.New()}
+		err := WithLevel(logger.Level(42))(&o)
+		require.Error(t, err)
+	})
 }
 
 func TestWithConsoleFormatter(t *testing.T) {

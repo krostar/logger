@@ -63,10 +63,17 @@ func TestWithConfig(t *testing.T) {
 }
 
 func TestWithLevel(t *testing.T) {
-	var cfg config
-	err := WithLevel(logger.LevelError)(&cfg)
-	require.NoError(t, err)
-	assert.Equal(t, zapcore.ErrorLevel, cfg.Level)
+	t.Run("success", func(t *testing.T) {
+		var cfg config
+		err := WithLevel(logger.LevelError)(&cfg)
+		require.NoError(t, err)
+		assert.Equal(t, zapcore.ErrorLevel, cfg.Level)
+	})
+	t.Run("fail", func(t *testing.T) {
+		var cfg config
+		err := WithLevel(logger.Level(42))(&cfg)
+		require.Error(t, err)
+	})
 }
 
 func TestWithConsoleFormatter(t *testing.T) {

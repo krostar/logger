@@ -15,7 +15,7 @@ type Logrus struct {
 	logrus.FieldLogger
 }
 
-// New returns a new zap instance.
+// New returns a new logrus instance.
 func New(opts ...Option) (*Logrus, error) {
 	var o options
 
@@ -50,7 +50,7 @@ func convertLevel(level logger.Level) (logrus.Level, error) {
 	case logger.LevelError:
 		logrusLevel = logrus.ErrorLevel
 	default:
-		return logrusLevel, errors.New("level conversion to zap level impossible")
+		return logrusLevel, errors.New("level conversion to logrus level impossible")
 	}
 	return logrusLevel, nil
 }
@@ -69,7 +69,7 @@ func (l *Logrus) SetLevel(level logger.Level) error {
 func (l *Logrus) WithField(key string, value interface{}) logger.Logger {
 	return &Logrus{
 		log:         l.log,
-		FieldLogger: l.log.WithField(key, value),
+		FieldLogger: l.FieldLogger.WithField(key, value),
 	}
 }
 
@@ -77,14 +77,14 @@ func (l *Logrus) WithField(key string, value interface{}) logger.Logger {
 func (l *Logrus) WithFields(fields map[string]interface{}) logger.Logger {
 	return &Logrus{
 		log:         l.log,
-		FieldLogger: l.log.WithFields(fields),
+		FieldLogger: l.FieldLogger.WithFields(fields),
 	}
 }
 
 // WithError implements Logger.WithError for logrus's logger.
 func (l *Logrus) WithError(err error) logger.Logger {
-	return &Logrus{
-		log:         l.log,
-		FieldLogger: l.log.WithError(err),
+	if err != nil {
+		return l.WithField(logger.FieldErrorKey, err.Error())
 	}
+	return l
 }
