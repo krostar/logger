@@ -2,6 +2,7 @@ package logrus
 
 import (
 	"io"
+	"os"
 	"testing"
 
 	"github.com/sirupsen/logrus"
@@ -44,6 +45,7 @@ func TestWithConfig(t *testing.T) {
 		var o = options{log: logrus.New()}
 
 		err := WithConfig(logger.Config{
+			Formatter: "json",
 			Verbosity: "boum",
 		})(&o)
 		require.Error(t, err)
@@ -57,6 +59,38 @@ func TestWithConfig(t *testing.T) {
 			Formatter: "boum",
 		})(&o)
 		require.Error(t, err)
+	})
+
+	t.Run("output stdout", func(t *testing.T) {
+		var o = options{log: logrus.New()}
+
+		err := WithConfig(logger.Config{
+			Formatter: "json",
+			Output:    "stdout",
+		})(&o)
+		require.NoError(t, err)
+		assert.Equal(t, os.Stdout, o.log.Out)
+	})
+
+	t.Run("output stderr", func(t *testing.T) {
+		var o = options{log: logrus.New()}
+
+		err := WithConfig(logger.Config{
+			Formatter: "json",
+			Output:    "stderr",
+		})(&o)
+		require.NoError(t, err)
+		assert.Equal(t, os.Stderr, o.log.Out)
+	})
+
+	t.Run("output empty", func(t *testing.T) {
+		var o = options{log: logrus.New()}
+
+		err := WithConfig(logger.Config{
+			Formatter: "json",
+		})(&o)
+		require.NoError(t, err)
+		assert.Equal(t, os.Stderr, o.log.Out)
 	})
 }
 

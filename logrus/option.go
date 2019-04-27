@@ -44,21 +44,9 @@ func WithConfig(cfg logger.Config) Option {
 	}
 
 	// outputs
-	if cfg.Output != "" {
-		f, err := os.OpenFile(cfg.Output, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.ModePerm)
-		if err != nil {
-			return func(c *options) error {
-				return errors.Wrapf(err, "unable to open/create file %q", cfg.Output)
-			}
-		}
-		opts = append(opts, WithOutput(f))
+	opts = append(opts, withOutputStr(cfg.Output))
 
-		runtime.SetFinalizer(f, func(ff *os.File) {
-			ff.Sync()  // nolint: errcheck, gosec
-			ff.Close() // nolint: errcheck, gosec
-		})
-	}
-
+	// return all options
 	return func(c *options) error {
 		for _, opt := range opts {
 			if err := opt(c); err != nil {
@@ -67,6 +55,36 @@ func WithConfig(cfg logger.Config) Option {
 		}
 		return nil
 	}
+}
+
+func withOutputStr(output string) Option {
+	var opt = func(*options) error { return nil }
+
+	if output == "" {
+		return opt
+	}
+
+	switch output {
+	case "stdout":
+		opt = WithOutput(os.Stdout)
+	case "stderr":
+		opt = WithOutput(os.Stderr)
+	default:
+		f, err := os.OpenFile(output, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.ModePerm)
+		if err != nil {
+			return func(c *options) error {
+				return errors.Wrapf(err, "unable to open/create file %q", output)
+			}
+		}
+		opt = WithOutput(f)
+
+		runtime.SetFinalizer(f, func(ff *os.File) {
+			ff.Sync()  // nolint: errcheck, gosec
+			ff.Close() // nolint: errcheck, gosec
+		})
+	}
+
+	return opt
 }
 
 // WithLevel configures the minimum level of the logger.
