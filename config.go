@@ -21,14 +21,14 @@ func (c *Config) SetDefault() {
 // Validate makes sure the configuration is valid.
 func (c *Config) Validate() error {
 	if _, err := ParseLevel(c.Verbosity); err != nil {
-		return errors.Wrap(err, "unable to parse level")
+		return errors.Wrapf(err, "unable to parse level %q", c.Verbosity)
 	}
 
-	switch f := c.Formatter; f {
+	switch c.Formatter {
 	case "json":
 	case "console":
 	default:
-		return errors.Errorf("unknown formatter %q", f)
+		return errors.Errorf("unknown formatter %q", c.Formatter)
 	}
 
 	return nil
