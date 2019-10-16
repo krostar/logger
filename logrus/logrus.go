@@ -1,9 +1,11 @@
+// Package logrus implements the logger.Logger interface using sirupsen/logrus implementation.
 package logrus
 
 import (
+	"errors"
+	"fmt"
 	"os"
 
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"github.com/krostar/logger"
@@ -28,7 +30,7 @@ func New(opts ...Option) (*Logrus, error) {
 
 	for _, opt := range opts {
 		if err := opt(&o); err != nil {
-			return nil, errors.Wrap(err, "unable to apply config")
+			return nil, fmt.Errorf("unable to apply config: %w", err)
 		}
 	}
 
@@ -59,7 +61,7 @@ func convertLevel(level logger.Level) (logrus.Level, error) {
 func (l *Logrus) SetLevel(level logger.Level) error {
 	lvl, err := convertLevel(level)
 	if err != nil {
-		return errors.Wrap(err, "unable to convert level")
+		return fmt.Errorf("unable to convert level: %w", err)
 	}
 	l.log.Level = lvl
 	return nil

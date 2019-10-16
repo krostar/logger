@@ -1,6 +1,8 @@
 package logger
 
-import "github.com/pkg/errors"
+import (
+	"fmt"
+)
 
 // Config defines all the configurable options for the logger.
 type Config struct {
@@ -21,14 +23,14 @@ func (c *Config) SetDefault() {
 // Validate makes sure the configuration is valid.
 func (c *Config) Validate() error {
 	if _, err := ParseLevel(c.Verbosity); err != nil {
-		return errors.Wrapf(err, "unable to parse level %q", c.Verbosity)
+		return fmt.Errorf("unable to parse level %q: %w", c.Verbosity, err)
 	}
 
 	switch c.Formatter {
 	case "json":
 	case "console":
 	default:
-		return errors.Errorf("unknown formatter %q", c.Formatter)
+		return fmt.Errorf("unknown formatter %q", c.Formatter)
 	}
 
 	return nil

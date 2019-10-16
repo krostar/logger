@@ -2,11 +2,11 @@ package zap
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	stdlog "log"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"

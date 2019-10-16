@@ -2,11 +2,10 @@ package logger
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	stdlog "log"
 	"os"
-
-	"github.com/pkg/errors"
 )
 
 // CaptureOutput catpures and merge stdout and stderr.
@@ -18,7 +17,7 @@ import (
 func CaptureOutput(writeFunc func()) (string, error) {
 	reader, writer, err := os.Pipe()
 	if err != nil {
-		return "", errors.Wrap(err, "unable to create pipe")
+		return "", fmt.Errorf("unable to create pipe: %w", err)
 	}
 
 	var (
@@ -34,16 +33,14 @@ func CaptureOutput(writeFunc func()) (string, error) {
 	os.Stdout = writer
 	os.Stderr = writer
 	stdlog.SetOutput(writer)
-
 	writeFunc()
-
 	if err := writer.Close(); err != nil {
-		return "", errors.Wrap(err, "unable to close writer")
+		return "", fmt.Errorf("unable to close writer: %w", err)
 	}
 
 	var output bytes.Buffer
 	if _, err := io.Copy(&output, reader); err != nil {
-		return "", errors.Wrap(err, "unable to read from reader")
+		return "", fmt.Errorf("unable to read from reader: %w", err)
 	}
 
 	return output.String(), nil

@@ -1,3 +1,5 @@
+// Package logmid is a net/http middleware that uses httpinfo and
+// logger.Logger to log HTTP requests.
 package logmid
 
 import (

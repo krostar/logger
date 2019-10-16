@@ -1,3 +1,5 @@
+// Package logger exposes a unique interface that hides the underlying implementation
+// and exposes useful function to switch back to a writer, or to a standard logger.
 package logger
 
 // Logger defines the way logs can be handled.

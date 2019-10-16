@@ -1,7 +1,8 @@
 package zap
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -25,7 +26,7 @@ func WithConfig(cfg logger.Config) Option {
 		opts = append(opts, WithLevel(lvl))
 	} else {
 		return func(c *config) error {
-			return errors.Wrapf(err, "unable to apply level %q", cfg.Verbosity)
+			return fmt.Errorf("unable to apply level %q: %w", cfg.Verbosity, err)
 		}
 	}
 
@@ -37,7 +38,7 @@ func WithConfig(cfg logger.Config) Option {
 		opts = append(opts, WithConsoleFormatter(cfg.WithColor))
 	default:
 		return func(c *config) error {
-			return errors.Errorf("unknown formatter %s", cfg.Formatter)
+			return fmt.Errorf("unknown formatter %s", cfg.Formatter)
 		}
 	}
 

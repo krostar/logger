@@ -127,31 +127,26 @@ func TestInMemory_Log(t *testing.T) {
 	var (
 		log   = NewInMemory(LevelQuiet)
 		tests = map[string]struct {
-			logFunc       func(args ...interface{})
-			logFFunc      func(format string, args ...interface{})
-			minimalLevel  Level
-			expectedLevel Level
+			logFunc  func(args ...interface{})
+			logFFunc func(format string, args ...interface{})
+			level    Level
 		}{
 			"debug": {
-				logFunc:       log.Debug,
-				logFFunc:      log.Debugf,
-				minimalLevel:  LevelDebug,
-				expectedLevel: LevelDebug,
+				logFunc:  log.Debug,
+				logFFunc: log.Debugf,
+				level:    LevelDebug,
 			}, "info": {
-				logFunc:       log.Info,
-				logFFunc:      log.Infof,
-				minimalLevel:  LevelInfo,
-				expectedLevel: LevelInfo,
+				logFunc:  log.Info,
+				logFFunc: log.Infof,
+				level:    LevelInfo,
 			}, "warn": {
-				logFunc:       log.Warn,
-				logFFunc:      log.Warnf,
-				minimalLevel:  LevelWarn,
-				expectedLevel: LevelWarn,
+				logFunc:  log.Warn,
+				logFFunc: log.Warnf,
+				level:    LevelWarn,
 			}, "error": {
-				logFunc:       log.Error,
-				logFFunc:      log.Errorf,
-				minimalLevel:  LevelError,
-				expectedLevel: LevelError,
+				logFunc:  log.Error,
+				logFFunc: log.Errorf,
+				level:    LevelError,
 			},
 		}
 	)
@@ -172,18 +167,18 @@ func TestInMemory_Log(t *testing.T) {
 			assert.Empty(t, log.Entries, "the verbosity was not supposed to be high enough to display something")
 
 			// now we should see logs
-			log.SetLevel(test.minimalLevel) // nolint: errcheck, gosec
+			log.SetLevel(test.level) // nolint: errcheck, gosec
 
 			// try again
 			test.logFunc("another thing", 42)
 			require.Len(t, log.Entries, 1)
-			assert.Equal(t, test.expectedLevel, log.Entries[0].Level)
+			assert.Equal(t, test.level, log.Entries[0].Level)
 			assert.Empty(t, log.Entries[0].Format, "format should only be set in the logF variant")
 			assert.Equal(t, log.Entries[0].Args, []interface{}{"another thing", 42})
 
 			test.logFFunc("toto %d", 42)
 			require.Len(t, log.Entries, 2)
-			assert.Equal(t, test.expectedLevel, log.Entries[1].Level)
+			assert.Equal(t, test.level, log.Entries[1].Level)
 			assert.Equal(t, log.Entries[1].Format, "toto %d")
 			assert.Equal(t, log.Entries[1].Args, []interface{}{42})
 		})

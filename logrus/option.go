@@ -1,11 +1,11 @@
 package logrus
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"runtime"
 
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"github.com/krostar/logger"
@@ -27,7 +27,7 @@ func WithConfig(cfg logger.Config) Option {
 		opts = append(opts, WithLevel(lvl))
 	} else {
 		return func(c *options) error {
-			return errors.Wrapf(err, "unable to apply level %q", cfg.Verbosity)
+			return fmt.Errorf("unable to apply level %q, %w", cfg.Verbosity, err)
 		}
 	}
 
@@ -39,7 +39,7 @@ func WithConfig(cfg logger.Config) Option {
 		opts = append(opts, WithConsoleFormatter(cfg.WithColor))
 	default:
 		return func(c *options) error {
-			return errors.Errorf("unknown formatter %s", cfg.Formatter)
+			return fmt.Errorf("unknown formatter %s", cfg.Formatter)
 		}
 	}
 
@@ -73,7 +73,7 @@ func withOutputStr(output string) Option {
 		f, err := os.OpenFile(output, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.ModePerm)
 		if err != nil {
 			return func(c *options) error {
-				return errors.Wrapf(err, "unable to open/create file %q", output)
+				return fmt.Errorf("unable to open/create file %q: %w", output, err)
 			}
 		}
 		opt = WithOutput(f)
@@ -93,7 +93,7 @@ func WithLevel(level logger.Level) Option {
 	return func(o *options) error {
 		lvl, err := convertLevel(level)
 		if err != nil {
-			return errors.Wrap(err, "failed to convert level")
+			return fmt.Errorf("failed to convert level: %w", err)
 		}
 		o.log.Level = lvl
 		return nil

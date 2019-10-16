@@ -2,8 +2,7 @@ package logmid
 
 import (
 	"context"
-
-	"github.com/pkg/errors"
+	"fmt"
 )
 
 type customCtx string
@@ -31,7 +30,7 @@ func AddErrorInContext(ctx context.Context, err error) {
 		if *errCtx == nil {
 			*errCtx = err
 		} else {
-			*errCtx = errors.Wrap(*errCtx, err.Error())
+			*errCtx = fmt.Errorf("%s: %w", err.Error(), *errCtx)
 		}
 	}
 }

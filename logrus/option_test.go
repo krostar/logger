@@ -12,35 +12,35 @@ import (
 	"github.com/krostar/logger"
 )
 
-func TestWithConfig(t *testing.T) {
-	t.Run("success", func(t *testing.T) {
-		var o = options{log: logrus.New()}
+func TestWithConfig_json(t *testing.T) {
+	var o = options{log: logrus.New()}
 
-		err := WithConfig(logger.Config{
-			Verbosity: "error",
-			Formatter: "json",
-			WithColor: false,
-		})(&o)
-		require.NoError(t, err)
+	err := WithConfig(logger.Config{
+		Verbosity: "error",
+		Formatter: "json",
+		WithColor: false,
+	})(&o)
+	require.NoError(t, err)
 
-		assert.Equal(t, logrus.ErrorLevel, o.log.Level)
-		assert.IsType(t, new(logrus.JSONFormatter), o.log.Formatter)
-	})
+	assert.Equal(t, logrus.ErrorLevel, o.log.Level)
+	assert.IsType(t, new(logrus.JSONFormatter), o.log.Formatter)
+}
 
-	t.Run("success with console", func(t *testing.T) {
-		var o = options{log: logrus.New()}
+func TestWithConfig_console(t *testing.T) {
+	var o = options{log: logrus.New()}
 
-		err := WithConfig(logger.Config{
-			Verbosity: "error",
-			Formatter: "console",
-			WithColor: false,
-		})(&o)
-		require.NoError(t, err)
+	err := WithConfig(logger.Config{
+		Verbosity: "error",
+		Formatter: "console",
+		WithColor: false,
+	})(&o)
+	require.NoError(t, err)
 
-		assert.Equal(t, logrus.ErrorLevel, o.log.Level)
-		assert.IsType(t, new(logrus.TextFormatter), o.log.Formatter)
-	})
+	assert.Equal(t, logrus.ErrorLevel, o.log.Level)
+	assert.IsType(t, new(logrus.TextFormatter), o.log.Formatter)
+}
 
+func TestWithConfig_error(t *testing.T) {
 	t.Run("unparsable level", func(t *testing.T) {
 		var o = options{log: logrus.New()}
 

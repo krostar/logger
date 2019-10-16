@@ -1,7 +1,10 @@
+// Package zap implements the logger.Logger interface using uber/zap implementation.
 package zap
 
 import (
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -44,7 +47,7 @@ func New(opts ...Option) (logger.Logger, func() error, error) {
 
 	for _, opt := range opts {
 		if err := opt(&config); err != nil {
-			return nil, nil, errors.Wrap(err, "unable to apply config")
+			return nil, nil, fmt.Errorf("unable to apply config: %w", err)
 		}
 	}
 
@@ -53,7 +56,7 @@ func New(opts ...Option) (logger.Logger, func() error, error) {
 
 	logger, err := config.Zap.Build()
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "unable to create logger")
+		return nil, nil, fmt.Errorf("unable to create logger: %w", err)
 	}
 
 	return &Zap{
@@ -83,7 +86,7 @@ func convertLevel(level logger.Level) (zapcore.Level, error) {
 func (l *Zap) SetLevel(level logger.Level) error {
 	zapLevel, err := convertLevel(level)
 	if err != nil {
-		return errors.Wrap(err, "logger level parsing to zap level failed")
+		return fmt.Errorf("logger level parsing to zap level failed: %w", err)
 	}
 	(l.level).SetLevel(zapLevel)
 	return nil
