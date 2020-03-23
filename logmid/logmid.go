@@ -54,9 +54,9 @@ func defaultLogAtLevelFunc(r *http.Request) logger.Level {
 
 	if httpinfo.IsUsed(r) {
 		switch status := httpinfo.Status(r); {
-		case status >= 500:
+		case status >= http.StatusInternalServerError:
 			lvl = logger.LevelError
-		case status >= 400 && status < 500:
+		case status >= http.StatusBadRequest && status < http.StatusInternalServerError:
 			lvl = logger.LevelWarn
 		default:
 			lvl = logger.LevelInfo
