@@ -19,7 +19,7 @@ type Zap struct {
 
 // New returns a new zap instance.
 func New(opts ...Option) (logger.Logger, func() error, error) {
-	var config = config{
+	config := config{
 		Level: zapcore.InfoLevel,
 		Zap: zap.Config{
 			Development:       false,

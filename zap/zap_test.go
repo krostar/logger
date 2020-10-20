@@ -15,14 +15,14 @@ import (
 	"github.com/krostar/logger"
 )
 
-func TestZapImplementLogger(t *testing.T) {
+func Test_ZapImplementLogger(t *testing.T) {
 	var i interface{} = new(Zap)
 	if _, ok := i.(logger.Logger); !ok {
 		t.Fatalf("expected %t to implement Logger", i)
 	}
 }
 
-func TestNew(t *testing.T) {
+func Test_New(t *testing.T) {
 	log, f, err := New()
 	assert.NotNil(t, log)
 	assert.NotNil(t, f)
@@ -34,8 +34,8 @@ func TestNew(t *testing.T) {
 	require.Error(t, err)
 }
 
-func TestConvertLevel(t *testing.T) {
-	var tests = map[string]struct {
+func Test_convertLevel(t *testing.T) {
+	tests := map[string]struct {
 		level            logger.Level
 		expectedZapLevel zapcore.Level
 		expectedFailure  bool
@@ -59,7 +59,7 @@ func TestConvertLevel(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		var test = test
+		test := test
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -74,7 +74,7 @@ func TestConvertLevel(t *testing.T) {
 	}
 }
 
-func TestRedirectStdLog(t *testing.T) {
+func Test_RedirectStdLog(t *testing.T) {
 	const imalog = "imalog"
 	var expectedOutput = map[string]interface{}{
 		"level":  zapcore.ErrorLevel.String(),

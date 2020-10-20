@@ -14,7 +14,7 @@ import (
 	"github.com/krostar/logger"
 )
 
-func newDeterministic() *Logrus {
+func newDeterministicLogger() *Logrus {
 	var log, _ = New()
 
 	log.log.Formatter = &logrus.JSONFormatter{
@@ -24,22 +24,22 @@ func newDeterministic() *Logrus {
 	return log
 }
 
-func TestLogrusImplementLogger(t *testing.T) {
+func Test_LogrusImplementLogger(t *testing.T) {
 	var i interface{} = new(Logrus)
 	if _, ok := i.(logger.Logger); !ok {
 		t.Fatalf("expected %t to implement Logger", i)
 	}
 }
 
-func TestLogrusNew_opt_failure(t *testing.T) {
+func Test_New_opt_failure(t *testing.T) {
 	_, err := New(WithConfig(logger.Config{
 		Formatter: "boum",
 	}))
 	require.Error(t, err)
 }
 
-func TestConvertLevel(t *testing.T) {
-	var tests = map[string]struct {
+func Test_convertLevel(t *testing.T) {
+	tests := map[string]struct {
 		expectedFailure     bool
 		level               logger.Level
 		expectedLogrusLevel logrus.Level
@@ -63,7 +63,8 @@ func TestConvertLevel(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		var test = test
+		test := test
+
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -78,9 +79,10 @@ func TestConvertLevel(t *testing.T) {
 	}
 }
 
-func TestRedirectStdLog(t *testing.T) {
+func Test_RedirectStdLog(t *testing.T) {
 	const imalog = "imalog"
-	var expectedOutput = map[string]interface{}{
+
+	expectedOutput := map[string]interface{}{
 		"level":  logrus.ErrorLevel.String(),
 		"msg":    "i'm a log",
 		"stdlog": "unhandled call to standard log package",
@@ -97,10 +99,8 @@ func TestRedirectStdLog(t *testing.T) {
 	t.Run("using logrus", func(t *testing.T) {
 		// redirect stdlog to logrus
 		outputRaw, err := logger.CaptureOutput(func() {
-			var (
-				log     = newDeterministic()
-				restore = logger.RedirectStdLog(log, logger.LevelError)
-			)
+			log := newDeterministicLogger()
+			restore := logger.RedirectStdLog(log, logger.LevelError)
 			defer restore()
 
 			stdlog.Println("i'm a log")
@@ -131,7 +131,7 @@ func TestLogrus_SetLevel(t *testing.T) {
 
 func TestLogrus_WithField(t *testing.T) {
 	outputRaw, err := logger.CaptureOutput(func() {
-		var log = newDeterministic()
+		var log = newDeterministicLogger()
 		log.WithField("hello", "world").WithField("answer", 42).Warn("warn")
 	})
 	require.NoError(t, err)
@@ -148,7 +148,7 @@ func TestLogrus_WithField(t *testing.T) {
 
 func TestLogrus_WithFields(t *testing.T) {
 	outputRaw, err := logger.CaptureOutput(func() {
-		var log = newDeterministic()
+		var log = newDeterministicLogger()
 		log.
 			WithFields(map[string]interface{}{"hello": "world"}).
 			WithFields(map[string]interface{}{"answer": 42}).
@@ -168,7 +168,7 @@ func TestLogrus_WithFields(t *testing.T) {
 
 func TestLogrus_WithError(t *testing.T) {
 	outputRaw, err := logger.CaptureOutput(func() {
-		var log = newDeterministic()
+		var log = newDeterministicLogger()
 		log.
 			WithError(errors.New("eww1")).
 			WithError(errors.New("eww2")).

@@ -12,32 +12,30 @@ import (
 	"github.com/krostar/logger"
 )
 
-func TestWithCallback(t *testing.T) {
+func Test_WithCallback(t *testing.T) {
 	var opts Options
 	WithCallback(func(r *http.Request) {})(&opts)
 	assert.Len(t, opts.onRequest, 1)
 }
 
-func TestWithLogLevelFunc(t *testing.T) {
+func Test_WithLogLevelFunc(t *testing.T) {
 	var opts Options
 	WithLogLevelFunc(func(r *http.Request) logger.Level { return logger.LevelDebug })(&opts)
 	assert.NotNil(t, opts.logAtLevel)
 }
 
-func TestWithDefaultFields(t *testing.T) {
-	var (
-		log = logger.NewInMemory(logger.LevelDebug)
-		mid = New(log, WithDefaultFields())
+func Test_WithDefaultFields(t *testing.T) {
+	log := logger.NewInMemory(logger.LevelDebug)
+	mid := New(log, WithDefaultFields())
 
-		w    = httptest.NewRecorder()
-		r, _ = http.NewRequest("POST", "http://local/path?query", nil)
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest("POST", "http://local/path?query", nil)
 
-		handler = func(w http.ResponseWriter, _ *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			_, err := w.Write([]byte("wrote"))
-			assert.NoError(t, err)
-		}
-	)
+	handler := func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, err := w.Write([]byte("wrote"))
+		assert.NoError(t, err)
+	}
 
 	r.Header.Set("User-Agent", "homemade")
 	r.RemoteAddr = "here"
@@ -56,7 +54,7 @@ func TestWithDefaultFields(t *testing.T) {
 	assert.Contains(t, entry.Fields, "route")
 }
 
-func TestWithMessage(t *testing.T) {
+func Test_WithMessage(t *testing.T) {
 	var opts Options
 	WithMessage("hello world")(&opts)
 	assert.Equal(t, "hello world", opts.message)

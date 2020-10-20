@@ -20,10 +20,8 @@ func CaptureOutput(writeFunc func()) (string, error) {
 		return "", fmt.Errorf("unable to create pipe: %w", err)
 	}
 
-	var (
-		oldStdout = os.Stdout
-		oldStderr = os.Stderr
-	)
+	oldStdout := os.Stdout
+	oldStderr := os.Stderr
 	defer func() { // restore stdout and stderr to the original state
 		os.Stdout = oldStdout
 		os.Stderr = oldStderr

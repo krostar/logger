@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCaptureOutput(t *testing.T) {
-	var stdout = os.Stdout
-	var stderr = os.Stderr
+func Test_CaptureOutput(t *testing.T) {
+	stdout := os.Stdout
+	stderr := os.Stderr
 
 	output, err := CaptureOutput(func() {
 		fmt.Print("log")

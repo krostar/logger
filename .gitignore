@@ -17,6 +17,9 @@
 /vendor
 /vendor.orig
 
-# Project-specific
+# Project specific
 /build
 mock_*.go
+
+# Developers specifig
+/.idea

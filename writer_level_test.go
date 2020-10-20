@@ -8,7 +8,7 @@ import (
 )
 
 func TestWriterLevel(t *testing.T) {
-	var l = NewInMemory(LevelDebug)
+	l := NewInMemory(LevelDebug)
 
 	writer := WriterLevel(l, LevelInfo)
 	require.NotNil(t, writer)

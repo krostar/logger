@@ -7,10 +7,9 @@ import (
 
 type customCtx string
 
-// nolint: gochecknoglobals
-var (
-	ctxLogFieldsKey = customCtx("fields")
-	ctxLogErrorsKey = customCtx("errors")
+const (
+	ctxLogFieldsKey customCtx = "fields"
+	ctxLogErrorsKey customCtx = "errors"
 )
 
 // AddFieldInContext add a log field to the context.

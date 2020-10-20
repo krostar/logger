@@ -6,28 +6,29 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/krostar/httpinfo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/krostar/httpinfo"
 	"github.com/krostar/logger"
 )
 
-func TestMiddleware(t *testing.T) {
-	var (
-		log            = logger.NewInMemory(logger.LevelDebug)
-		w              = httptest.NewRecorder()
-		r, _           = http.NewRequest("POST", "http://local/path?query", nil)
-		expectedFields = map[string]interface{}{
-			"key":                "value",
-			logger.FieldErrorKey: "", // value will not be checked, only the key
-		}
-		handler = func(w http.ResponseWriter, _ *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			_, err := w.Write([]byte("wrote"))
-			assert.NoError(t, err)
-		}
-	)
+func Test_Middleware(t *testing.T) {
+	log := logger.NewInMemory(logger.LevelDebug)
+
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest("POST", "http://local/path?query", nil)
+
+	expectedFields := map[string]interface{}{
+		"key":                "value",
+		logger.FieldErrorKey: "", // value will not be checked, only the key
+	}
+	handler := func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, err := w.Write([]byte("wrote"))
+		assert.NoError(t, err)
+	}
+
 	r.Header.Set("User-Agent", "super-agent-test")
 	r.RemoteAddr = "10.11.12.13"
 
@@ -60,53 +61,50 @@ func TestMiddleware(t *testing.T) {
 	assert.Equal(t, logger.LevelDebug, log.Entries[0].Level)
 }
 
-func TestDefaultLogAtLevelFunc(t *testing.T) {
-	var (
-		log   = logger.NewInMemory(logger.LevelDebug)
-		tests = map[string]struct {
-			status        int
-			expectedLevel logger.Level
-			useRecorder   bool
-		}{
-			"no recorder ok": {
-				status:        http.StatusOK,
-				expectedLevel: logger.LevelInfo,
-				useRecorder:   false,
-			},
-			"no recorder nok": {
-				status:        http.StatusInternalServerError,
-				expectedLevel: logger.LevelInfo,
-				useRecorder:   false,
-			},
-			"recorder >200<400": {
-				status:        http.StatusOK,
-				expectedLevel: logger.LevelInfo,
-				useRecorder:   true,
-			},
-			"recorder >400<500": {
-				status:        http.StatusBadRequest,
-				expectedLevel: logger.LevelWarn,
-				useRecorder:   true,
-			},
-			"recorder >500": {
-				status:        http.StatusInternalServerError,
-				expectedLevel: logger.LevelError,
-				useRecorder:   true,
-			},
-		}
-	)
+func Test_defaultLogAtLevelFunc(t *testing.T) {
+	log := logger.NewInMemory(logger.LevelDebug)
+	tests := map[string]struct {
+		status        int
+		expectedLevel logger.Level
+		useRecorder   bool
+	}{
+		"no recorder ok": {
+			status:        http.StatusOK,
+			expectedLevel: logger.LevelInfo,
+			useRecorder:   false,
+		},
+		"no recorder nok": {
+			status:        http.StatusInternalServerError,
+			expectedLevel: logger.LevelInfo,
+			useRecorder:   false,
+		},
+		"recorder >200<400": {
+			status:        http.StatusOK,
+			expectedLevel: logger.LevelInfo,
+			useRecorder:   true,
+		},
+		"recorder >400<500": {
+			status:        http.StatusBadRequest,
+			expectedLevel: logger.LevelWarn,
+			useRecorder:   true,
+		},
+		"recorder >500": {
+			status:        http.StatusInternalServerError,
+			expectedLevel: logger.LevelError,
+			useRecorder:   true,
+		},
+	}
 
 	for name, test := range tests {
-		var test = test
+		test := test
 
 		t.Run(name, func(t *testing.T) {
-			var (
-				w                 = httptest.NewRecorder()
-				r, _              = http.NewRequest("POST", "http://local/path?query", nil)
-				h    http.Handler = http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
-					rw.WriteHeader(test.status)
-				})
-			)
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest("POST", "http://local/path?query", nil)
+
+			var h http.Handler = http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
+				rw.WriteHeader(test.status)
+			})
 
 			h = New(log)(h)
 			if test.useRecorder {

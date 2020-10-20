@@ -14,10 +14,9 @@ func StdLog(logger Logger, at Level) *stdlog.Logger {
 // RedirectStdLog redirects standard logger calls to the underlying logger.
 // This is heavily inspired by zap's way of doing the same thing.
 func RedirectStdLog(l Logger, at Level) func() {
-	var (
-		oldFlags  = stdlog.Flags()
-		oldPrefix = stdlog.Prefix()
-	)
+	oldFlags := stdlog.Flags()
+	oldPrefix := stdlog.Prefix()
+
 	stdlog.SetPrefix("")
 	stdlog.SetFlags(0)
 

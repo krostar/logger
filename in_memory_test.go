@@ -15,7 +15,7 @@ func TestInMemoryImplementLogger(t *testing.T) {
 	}
 }
 func TestInMemory_Reset(t *testing.T) {
-	var log = NewInMemory(LevelDebug)
+	log := NewInMemory(LevelDebug)
 
 	log.Info("hello world")
 	assert.NotEmpty(t, log.Entries)
@@ -25,7 +25,7 @@ func TestInMemory_Reset(t *testing.T) {
 }
 
 func TestInMemory_SetLevel(t *testing.T) {
-	var log = NewInMemory(LevelDebug)
+	log := NewInMemory(LevelDebug)
 
 	err := log.SetLevel(LevelError)
 	assert.NoError(t, err)
@@ -33,11 +33,9 @@ func TestInMemory_SetLevel(t *testing.T) {
 }
 
 func TestInMemory_WithField(t *testing.T) {
-	var (
-		lR  = NewInMemory(LevelDebug)
-		llF = lR.WithField("hello", "world")
-		lF  = llF.(*InMemory)
-	)
+	lR := NewInMemory(LevelDebug)
+	llF := lR.WithField("hello", "world")
+	lF, _ := llF.(*InMemory)
 
 	assert.NotEqual(t, lR, lF)
 	assert.Equal(t, lR, lF.parent)
@@ -47,12 +45,10 @@ func TestInMemory_WithField(t *testing.T) {
 }
 
 func TestInMemory_WithFields(t *testing.T) {
-	var (
-		fields = map[string]interface{}{"hello": "world"}
-		lR     = NewInMemory(LevelDebug)
-		llF    = lR.WithFields(fields)
-		lF     = llF.(*InMemory)
-	)
+	fields := map[string]interface{}{"hello": "world"}
+	lR := NewInMemory(LevelDebug)
+	llF := lR.WithFields(fields)
+	lF, _ := llF.(*InMemory)
 
 	assert.NotEqual(t, lR, lF)
 	assert.Equal(t, lR, lF.parent)
@@ -60,12 +56,10 @@ func TestInMemory_WithFields(t *testing.T) {
 }
 
 func TestInMemory_WithError(t *testing.T) {
-	var (
-		err = errors.New("hello world")
-		lR  = NewInMemory(LevelDebug)
-		llF = lR.WithError(err)
-		lF  = llF.(*InMemory)
-	)
+	err := errors.New("hello world")
+	lR := NewInMemory(LevelDebug)
+	llF := lR.WithError(err)
+	lF, _ := llF.(*InMemory)
 
 	assert.NotEqual(t, lR, lF)
 	assert.Equal(t, lR, lF.parent)
@@ -75,7 +69,7 @@ func TestInMemory_WithError(t *testing.T) {
 }
 
 func TestInMemory_log(t *testing.T) {
-	var log = NewInMemory(LevelInfo)
+	log := NewInMemory(LevelInfo)
 
 	t.Run("root, inferior level", func(t *testing.T) {
 		log.Reset()
@@ -109,7 +103,7 @@ func TestInMemory_log(t *testing.T) {
 	t.Run("child", func(t *testing.T) {
 		log.Reset()
 
-		child, _ := log.WithField("child", true).(*InMemory) // nolint: errcheck
+		child, _ := log.WithField("child", true).(*InMemory)
 		child.log(map[string]interface{}{"hello": "world"}, LevelWarn, "%s", []interface{}{"toto"})
 
 		require.Len(t, log.Entries, 1)
@@ -124,39 +118,37 @@ func TestInMemory_log(t *testing.T) {
 }
 
 func TestInMemory_Log(t *testing.T) {
-	var (
-		log   = NewInMemory(LevelQuiet)
-		tests = map[string]struct {
-			logFunc  func(args ...interface{})
-			logFFunc func(format string, args ...interface{})
-			level    Level
-		}{
-			"debug": {
-				logFunc:  log.Debug,
-				logFFunc: log.Debugf,
-				level:    LevelDebug,
-			}, "info": {
-				logFunc:  log.Info,
-				logFFunc: log.Infof,
-				level:    LevelInfo,
-			}, "warn": {
-				logFunc:  log.Warn,
-				logFFunc: log.Warnf,
-				level:    LevelWarn,
-			}, "error": {
-				logFunc:  log.Error,
-				logFFunc: log.Errorf,
-				level:    LevelError,
-			},
-		}
-	)
+	log := NewInMemory(LevelQuiet)
+	tests := map[string]struct {
+		logFunc  func(args ...interface{})
+		logFFunc func(format string, args ...interface{})
+		level    Level
+	}{
+		"debug": {
+			logFunc:  log.Debug,
+			logFFunc: log.Debugf,
+			level:    LevelDebug,
+		}, "info": {
+			logFunc:  log.Info,
+			logFFunc: log.Infof,
+			level:    LevelInfo,
+		}, "warn": {
+			logFunc:  log.Warn,
+			logFFunc: log.Warnf,
+			level:    LevelWarn,
+		}, "error": {
+			logFunc:  log.Error,
+			logFFunc: log.Errorf,
+			level:    LevelError,
+		},
+	}
 
 	for name, test := range tests {
-		var test = test
+		test := test
 		t.Run(name, func(t *testing.T) {
 			// tests can't be ran in parallel as they share the same logger
 			log.Reset()
-			log.SetLevel(LevelQuiet) // nolint: errcheck, gosec
+			_ = log.SetLevel(LevelQuiet)
 
 			assert.Empty(t, log.fields, "original logger should not contain any fields")
 			assert.Empty(t, log.Entries, "original logger should not contain any entries")
@@ -167,7 +159,7 @@ func TestInMemory_Log(t *testing.T) {
 			assert.Empty(t, log.Entries, "the verbosity was not supposed to be high enough to display something")
 
 			// now we should see logs
-			log.SetLevel(test.level) // nolint: errcheck, gosec
+			_ = log.SetLevel(test.level)
 
 			// try again
 			test.logFunc("another thing", 42)

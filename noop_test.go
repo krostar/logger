@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNoopImplementLogger(t *testing.T) {
+func Test_NoopImplementLogger(t *testing.T) {
 	var i interface{} = new(Noop)
 	if _, ok := i.(Logger); !ok {
 		t.Fatalf("expected %t to implement Logger", i)
@@ -40,7 +40,7 @@ func TestNoop_RedirectStdLog(t *testing.T) {
 	require.Equal(t, "second\n", output)
 }
 
-func TestNoopUselessButUntestable(*testing.T) {
+func Test_NoopUselessButUntestable(*testing.T) {
 	var log Noop
 
 	log.Debug("debug")
@@ -54,5 +54,5 @@ func TestNoopUselessButUntestable(*testing.T) {
 	log.WithError(errors.New("eww")).Info("info")
 	log.WithField("a", "b").Info("info")
 	log.WithFields(map[string]interface{}{"a": "b"}).Info("info")
-	log.SetLevel(LevelError) // nolint: errcheck, gosec
+	_ = log.SetLevel(LevelError)
 }

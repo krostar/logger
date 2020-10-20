@@ -79,8 +79,8 @@ func withOutputStr(output string) Option {
 		opt = WithOutput(f)
 
 		runtime.SetFinalizer(f, func(ff *os.File) {
-			ff.Sync()  // nolint: errcheck, gosec
-			ff.Close() // nolint: errcheck, gosec
+			_ = ff.Sync()
+			_ = ff.Close()
 		})
 	}
 
@@ -136,6 +136,22 @@ func WithOutput(writer io.Writer) Option {
 func WithInstance(log *logrus.Logger) Option {
 	return func(o *options) error {
 		o.log = log
+		return nil
+	}
+}
+
+// WithoutTime configures the logger to log without time.
+// It only works with standard logrus formatter.
+func WithoutTime() Option {
+	return func(o *options) error {
+		switch t := o.log.Formatter.(type) {
+		case *logrus.TextFormatter:
+			t.DisableTimestamp = true
+		case *logrus.JSONFormatter:
+			t.DisableTimestamp = true
+		default:
+			return fmt.Errorf("unhandled formatter %v", t)
+		}
 		return nil
 	}
 }

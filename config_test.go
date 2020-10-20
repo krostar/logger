@@ -7,19 +7,15 @@ import (
 )
 
 func TestConfig_SetDefault(t *testing.T) {
-	var (
-		cfg         Config
-		expectedCfg = Config{
-			Verbosity: LevelInfo.String(),
-			Formatter: "console",
-			WithColor: true,
-			Output:    "stdout",
-		}
-	)
-
+	var cfg Config
 	cfg.SetDefault()
 
-	assert.Equal(t, expectedCfg, cfg)
+	assert.Equal(t, Config{
+		Verbosity: LevelInfo.String(),
+		Formatter: "console",
+		WithColor: true,
+		Output:    "stdout",
+	}, cfg)
 }
 
 func TestConfig_Validate(t *testing.T) {

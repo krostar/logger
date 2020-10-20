@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestParseLevel(t *testing.T) {
-	var tests = map[string]struct {
+func Test_ParseLevel(t *testing.T) {
+	tests := map[string]struct {
 		levelStr        string
 		expectedLevel   Level
 		expectedFailure bool
@@ -39,7 +39,7 @@ func TestParseLevel(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		var test = test
+		test := test
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
@@ -55,8 +55,8 @@ func TestParseLevel(t *testing.T) {
 	}
 }
 
-func TestString(t *testing.T) {
-	var tests = map[string]struct {
+func Test_String(t *testing.T) {
+	tests := map[string]struct {
 		level            Level
 		expectedLevelStr string
 	}{
@@ -82,7 +82,7 @@ func TestString(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		var test = test
+		test := test
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			assert.Equal(t, test.expectedLevelStr, test.level.String())
@@ -90,30 +90,28 @@ func TestString(t *testing.T) {
 	}
 }
 
-func TestLogAtLevelFunc(t *testing.T) {
-	var (
-		log   = NewInMemory(LevelDebug)
-		tests = map[string]struct {
-			level             Level
-			expectedNoEntries bool
-		}{
-			"debug level": {
-				level: LevelDebug,
-			}, "info level": {
-				level: LevelInfo,
-			}, "warn level": {
-				level: LevelWarn,
-			}, "error level": {
-				level: LevelError,
-			}, "quiet level": {
-				level:             LevelQuiet,
-				expectedNoEntries: true,
-			},
-		}
-	)
+func Test_LogAtLevelFunc(t *testing.T) {
+	log := NewInMemory(LevelDebug)
+	tests := map[string]struct {
+		level             Level
+		expectedNoEntries bool
+	}{
+		"debug level": {
+			level: LevelDebug,
+		}, "info level": {
+			level: LevelInfo,
+		}, "warn level": {
+			level: LevelWarn,
+		}, "error level": {
+			level: LevelError,
+		}, "quiet level": {
+			level:             LevelQuiet,
+			expectedNoEntries: true,
+		},
+	}
 
 	for name, test := range tests {
-		var test = test
+		test := test
 		t.Run(name, func(t *testing.T) {
 			log.Reset()
 
@@ -131,30 +129,28 @@ func TestLogAtLevelFunc(t *testing.T) {
 	}
 }
 
-func TestLogFAtLevelFunc(t *testing.T) {
-	var (
-		log   = NewInMemory(LevelDebug)
-		tests = map[string]struct {
-			level             Level
-			expectedNoEntries bool
-		}{
-			"debug level": {
-				level: LevelDebug,
-			}, "info level": {
-				level: LevelInfo,
-			}, "warn level": {
-				level: LevelWarn,
-			}, "error level": {
-				level: LevelError,
-			}, "quiet level": {
-				level:             LevelQuiet,
-				expectedNoEntries: true,
-			},
-		}
-	)
+func Test_LogFAtLevelFunc(t *testing.T) {
+	log := NewInMemory(LevelDebug)
+	tests := map[string]struct {
+		level             Level
+		expectedNoEntries bool
+	}{
+		"debug level": {
+			level: LevelDebug,
+		}, "info level": {
+			level: LevelInfo,
+		}, "warn level": {
+			level: LevelWarn,
+		}, "error level": {
+			level: LevelError,
+		}, "quiet level": {
+			level:             LevelQuiet,
+			expectedNoEntries: true,
+		},
+	}
 
 	for name, test := range tests {
-		var test = test
+		test := test
 		t.Run(name, func(t *testing.T) {
 			log.Reset()
 

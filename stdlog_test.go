@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestToStdLog(t *testing.T) {
+func Test_ToStdLog(t *testing.T) {
 	var (
 		log    = NewInMemory(LevelDebug)
 		stdLog = StdLog(log, LevelWarn)
@@ -21,7 +21,7 @@ func TestToStdLog(t *testing.T) {
 	assert.Equal(t, log.Entries[0].Args[0], "Hello world")
 }
 
-func TestRedirectStdLog(t *testing.T) {
+func Test_RedirectStdLog(t *testing.T) {
 	const imalog = "i'm a log"
 
 	var (

@@ -110,3 +110,11 @@ func WithZapConfig(cfg zap.Config) Option {
 		return nil
 	}
 }
+
+// WithoutTime configures the logger to log without time.
+func WithoutTime() Option {
+	return func(c *config) error {
+		c.Zap.EncoderConfig.TimeKey = ""
+		return nil
+	}
+}

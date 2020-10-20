@@ -12,7 +12,7 @@ import (
 	"github.com/krostar/logger"
 )
 
-func TestWithConfig_json(t *testing.T) {
+func Test_WithConfig_json(t *testing.T) {
 	var o = options{log: logrus.New()}
 
 	err := WithConfig(logger.Config{
@@ -26,7 +26,7 @@ func TestWithConfig_json(t *testing.T) {
 	assert.IsType(t, new(logrus.JSONFormatter), o.log.Formatter)
 }
 
-func TestWithConfig_console(t *testing.T) {
+func Test_WithConfig_console(t *testing.T) {
 	var o = options{log: logrus.New()}
 
 	err := WithConfig(logger.Config{
@@ -40,7 +40,7 @@ func TestWithConfig_console(t *testing.T) {
 	assert.IsType(t, new(logrus.TextFormatter), o.log.Formatter)
 }
 
-func TestWithConfig_error(t *testing.T) {
+func Test_WithConfig_error(t *testing.T) {
 	t.Run("unparsable level", func(t *testing.T) {
 		var o = options{log: logrus.New()}
 
@@ -94,7 +94,7 @@ func TestWithConfig_error(t *testing.T) {
 	})
 }
 
-func TestWithLevel(t *testing.T) {
+func Test_WithLevel(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		var o = options{log: logrus.New()}
 		err := WithLevel(logger.LevelError)(&o)
@@ -108,7 +108,7 @@ func TestWithLevel(t *testing.T) {
 	})
 }
 
-func TestWithConsoleFormatter(t *testing.T) {
+func Test_WithConsoleFormatter(t *testing.T) {
 	var o = options{log: logrus.New()}
 
 	err := WithConsoleFormatter(true)(&o)
@@ -120,14 +120,14 @@ func TestWithConsoleFormatter(t *testing.T) {
 	assert.IsType(t, new(logrus.TextFormatter), o.log.Formatter)
 }
 
-func TestWithJSONFormatter(t *testing.T) {
+func Test_WithJSONFormatter(t *testing.T) {
 	var o = options{log: logrus.New()}
 	err := WithJSONFormatter()(&o)
 	require.NoError(t, err)
 	assert.IsType(t, new(logrus.JSONFormatter), o.log.Formatter)
 }
 
-func TestWithOutput(t *testing.T) {
+func Test_WithOutput(t *testing.T) {
 	var (
 		o         = options{log: logrus.New()}
 		_, writer = io.Pipe()
@@ -139,7 +139,7 @@ func TestWithOutput(t *testing.T) {
 	assert.Equal(t, writer, o.log.Out)
 }
 
-func TestWithInstance(t *testing.T) {
+func Test_WithInstance(t *testing.T) {
 	var (
 		o options
 		l = logrus.New()
@@ -149,4 +149,30 @@ func TestWithInstance(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, l, o.log)
+}
+
+func Test_WithoutTime(t *testing.T) {
+	t.Run("with text formatter", func(t *testing.T) {
+		o := options{log: logrus.New()}
+		require.NoError(t, WithConsoleFormatter(false)(&o))
+		require.IsType(t, o.log.Formatter, &logrus.TextFormatter{})
+		assert.False(t, (o.log.Formatter.(*logrus.TextFormatter)).DisableTimestamp)
+		require.NoError(t, WithoutTime()(&o))
+		assert.True(t, (o.log.Formatter.(*logrus.TextFormatter)).DisableTimestamp)
+	})
+
+	t.Run("with json formatter", func(t *testing.T) {
+		o := options{log: logrus.New()}
+		require.NoError(t, WithJSONFormatter()(&o))
+		require.IsType(t, o.log.Formatter, &logrus.JSONFormatter{})
+		assert.False(t, (o.log.Formatter.(*logrus.JSONFormatter)).DisableTimestamp)
+		require.NoError(t, WithoutTime()(&o))
+		assert.True(t, (o.log.Formatter.(*logrus.JSONFormatter)).DisableTimestamp)
+	})
+
+	t.Run("with unhandled formatter", func(t *testing.T) {
+		o := options{log: logrus.New()}
+		o.log.Formatter = nil
+		require.Error(t, WithoutTime()(&o))
+	})
 }

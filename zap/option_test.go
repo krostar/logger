@@ -11,7 +11,7 @@ import (
 	"github.com/krostar/logger"
 )
 
-func TestWithConfig(t *testing.T) {
+func Test_WithConfig(t *testing.T) {
 	t.Run("success with json", func(t *testing.T) {
 		var cfg config
 		err := WithConfig(logger.Config{
@@ -62,7 +62,7 @@ func TestWithConfig(t *testing.T) {
 	})
 }
 
-func TestWithLevel(t *testing.T) {
+func Test_WithLevel(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		var cfg config
 		err := WithLevel(logger.LevelError)(&cfg)
@@ -76,7 +76,7 @@ func TestWithLevel(t *testing.T) {
 	})
 }
 
-func TestWithConsoleFormatter(t *testing.T) {
+func Test_WithConsoleFormatter(t *testing.T) {
 	var cfg config
 
 	err := WithConsoleFormatter(true)(&cfg)
@@ -87,21 +87,31 @@ func TestWithConsoleFormatter(t *testing.T) {
 	assert.Equal(t, "console", cfg.Zap.Encoding)
 }
 
-func TestWithJSONFormatter(t *testing.T) {
+func Test_WithJSONFormatter(t *testing.T) {
 	var cfg config
 	err := WithJSONFormatter()(&cfg)
 	require.NoError(t, err)
 	assert.Equal(t, "json", cfg.Zap.Encoding)
 }
 
-func TestWithOutputPaths(t *testing.T) {
+func Test_WithOutputPaths(t *testing.T) {
 	var cfg config
 	err := WithOutputPaths([]string{"yolo", "yili"})(&cfg)
 	require.NoError(t, err)
 	assert.Equal(t, []string{"yolo", "yili"}, cfg.Zap.OutputPaths)
 }
 
-func TestWithZapConfig(t *testing.T) {
+func Test_WithoutTime(t *testing.T) {
+	var cfg config
+
+	cfg.Zap.EncoderConfig.TimeKey = "foo"
+
+	err := WithoutTime()(&cfg)
+	require.NoError(t, err)
+	assert.Equal(t, "", cfg.Zap.EncoderConfig.TimeKey)
+}
+
+func Test_WithZapConfig(t *testing.T) {
 	var (
 		cfg    config
 		zapCfg = zap.Config{

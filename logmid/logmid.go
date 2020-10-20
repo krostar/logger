@@ -7,12 +7,13 @@ import (
 	"net/http"
 
 	"github.com/krostar/httpinfo"
+
 	"github.com/krostar/logger"
 )
 
 // New returns a middleware that log requests.
 func New(log logger.Logger, opts ...Option) func(http.Handler) http.Handler {
-	var o = Options{
+	o := Options{
 		message:    "http request",
 		logAtLevel: defaultLogAtLevelFunc,
 	}
@@ -24,8 +25,8 @@ func New(log logger.Logger, opts ...Option) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 			var (
-				ctx    = r.Context()
 				err    error
+				ctx    = r.Context()
 				fields = make(map[string]interface{})
 			)
 
