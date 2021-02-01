@@ -24,11 +24,10 @@ func New(log logger.Logger, opts ...Option) func(http.Handler) http.Handler {
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-			var (
-				err    error
-				ctx    = r.Context()
-				fields = make(map[string]interface{})
-			)
+			var err error
+
+			ctx := r.Context()
+			fields := make(map[string]interface{})
 
 			ctx = context.WithValue(ctx, ctxLogErrorsKey, &err)
 			ctx = context.WithValue(ctx, ctxLogFieldsKey, fields)

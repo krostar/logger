@@ -112,12 +112,11 @@ func Test_WithoutTime(t *testing.T) {
 }
 
 func Test_WithZapConfig(t *testing.T) {
-	var (
-		cfg    config
-		zapCfg = zap.Config{
-			Development: true,
-		}
-	)
+	var cfg config
+
+	zapCfg := zap.Config{
+		Development: true,
+	}
 	err := WithZapConfig(zapCfg)(&cfg)
 	require.NoError(t, err)
 	assert.Equal(t, zapCfg, cfg.Zap)

@@ -58,7 +58,7 @@ func WithConfig(cfg logger.Config) Option {
 }
 
 func withOutputStr(output string) Option {
-	var opt = func(*options) error { return nil }
+	opt := func(*options) error { return nil }
 
 	if output == "" {
 		return opt

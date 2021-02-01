@@ -10,10 +10,8 @@ import (
 )
 
 func Test_AddFieldInContext(t *testing.T) {
-	var (
-		fields = make(map[string]interface{})
-		ctx    = context.WithValue(context.Background(), ctxLogFieldsKey, fields)
-	)
+	fields := make(map[string]interface{})
+	ctx := context.WithValue(context.Background(), ctxLogFieldsKey, fields)
 
 	AddFieldInContext(ctx, "key1", "value1")
 	AddFieldInContext(ctx, "key2", "value2")
@@ -22,10 +20,9 @@ func Test_AddFieldInContext(t *testing.T) {
 }
 
 func Test_AddErrorInContext(t *testing.T) {
-	var (
-		err error
-		ctx = context.WithValue(context.Background(), ctxLogErrorsKey, &err)
-	)
+	var err error
+
+	ctx := context.WithValue(context.Background(), ctxLogErrorsKey, &err)
 
 	AddErrorInContext(ctx, errors.New("eww1"))
 	AddErrorInContext(ctx, errors.New("eww2"))

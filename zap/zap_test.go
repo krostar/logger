@@ -76,7 +76,7 @@ func Test_convertLevel(t *testing.T) {
 
 func Test_RedirectStdLog(t *testing.T) {
 	const imalog = "imalog"
-	var expectedOutput = map[string]interface{}{
+	expectedOutput := map[string]interface{}{
 		"level":  zapcore.ErrorLevel.String(),
 		"msg":    "i'm a log",
 		"stdlog": "unhandled call to standard log package",
@@ -109,15 +109,12 @@ func Test_RedirectStdLog(t *testing.T) {
 }
 
 func TestZap_SetLevel(t *testing.T) {
-	var (
-		err  error
-		zLvl = zap.NewAtomicLevelAt(zapcore.InfoLevel)
-		log  = Zap{
-			level: &zLvl,
-		}
-	)
+	zLvl := zap.NewAtomicLevelAt(zapcore.InfoLevel)
+	log := Zap{
+		level: &zLvl,
+	}
 
-	err = log.SetLevel(logger.LevelDebug)
+	err := log.SetLevel(logger.LevelDebug)
 	assert.NoError(t, err)
 	assert.Equal(t, zapcore.DebugLevel, zLvl.Level())
 
@@ -128,7 +125,7 @@ func TestZap_SetLevel(t *testing.T) {
 
 func TestZap_WithField(t *testing.T) {
 	outputRaw, err := logger.CaptureOutput(func() {
-		var log = &Zap{SugaredLogger: zap.NewExample().Sugar()}
+		log := &Zap{SugaredLogger: zap.NewExample().Sugar()}
 		log.WithField("hello", "world").WithField("answer", 42).Warn("warn")
 	})
 	require.NoError(t, err)
@@ -145,7 +142,7 @@ func TestZap_WithField(t *testing.T) {
 
 func TestZap_WithFields(t *testing.T) {
 	outputRaw, err := logger.CaptureOutput(func() {
-		var log = &Zap{SugaredLogger: zap.NewExample().Sugar()}
+		log := &Zap{SugaredLogger: zap.NewExample().Sugar()}
 		log.
 			WithFields(map[string]interface{}{"hello": "world"}).
 			WithFields(map[string]interface{}{"answer": 42}).
@@ -165,7 +162,7 @@ func TestZap_WithFields(t *testing.T) {
 
 func TestZap_WithError(t *testing.T) {
 	outputRaw, err := logger.CaptureOutput(func() {
-		var log = &Zap{SugaredLogger: zap.NewExample().Sugar()}
+		log := &Zap{SugaredLogger: zap.NewExample().Sugar()}
 		log.
 			WithError(errors.New("eww1")).
 			WithError(errors.New("eww2")).

@@ -15,7 +15,7 @@ import (
 )
 
 func newDeterministicLogger() *Logrus {
-	var log, _ = New()
+	log, _ := New()
 
 	log.log.Formatter = &logrus.JSONFormatter{
 		DisableTimestamp: true,
@@ -114,7 +114,7 @@ func Test_RedirectStdLog(t *testing.T) {
 }
 
 func TestLogrus_SetLevel(t *testing.T) {
-	var log, _ = New(WithLevel(logger.LevelDebug))
+	log, _ := New(WithLevel(logger.LevelDebug))
 	assert.Equal(t, logrus.DebugLevel, log.log.Level)
 
 	t.Run("nominal", func(t *testing.T) {
@@ -148,7 +148,7 @@ func TestLogrus_WithField(t *testing.T) {
 
 func TestLogrus_WithFields(t *testing.T) {
 	outputRaw, err := logger.CaptureOutput(func() {
-		var log = newDeterministicLogger()
+		log := newDeterministicLogger()
 		log.
 			WithFields(map[string]interface{}{"hello": "world"}).
 			WithFields(map[string]interface{}{"answer": 42}).
@@ -168,7 +168,7 @@ func TestLogrus_WithFields(t *testing.T) {
 
 func TestLogrus_WithError(t *testing.T) {
 	outputRaw, err := logger.CaptureOutput(func() {
-		var log = newDeterministicLogger()
+		log := newDeterministicLogger()
 		log.
 			WithError(errors.New("eww1")).
 			WithError(errors.New("eww2")).

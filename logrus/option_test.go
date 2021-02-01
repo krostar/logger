@@ -13,7 +13,7 @@ import (
 )
 
 func Test_WithConfig_json(t *testing.T) {
-	var o = options{log: logrus.New()}
+	o := options{log: logrus.New()}
 
 	err := WithConfig(logger.Config{
 		Verbosity: "error",
@@ -27,7 +27,7 @@ func Test_WithConfig_json(t *testing.T) {
 }
 
 func Test_WithConfig_console(t *testing.T) {
-	var o = options{log: logrus.New()}
+	o := options{log: logrus.New()}
 
 	err := WithConfig(logger.Config{
 		Verbosity: "error",
@@ -42,7 +42,7 @@ func Test_WithConfig_console(t *testing.T) {
 
 func Test_WithConfig_error(t *testing.T) {
 	t.Run("unparsable level", func(t *testing.T) {
-		var o = options{log: logrus.New()}
+		o := options{log: logrus.New()}
 
 		err := WithConfig(logger.Config{
 			Formatter: "json",
@@ -52,7 +52,7 @@ func Test_WithConfig_error(t *testing.T) {
 	})
 
 	t.Run("unknown format", func(t *testing.T) {
-		var o = options{log: logrus.New()}
+		o := options{log: logrus.New()}
 
 		err := WithConfig(logger.Config{
 			Verbosity: "error",
@@ -62,7 +62,7 @@ func Test_WithConfig_error(t *testing.T) {
 	})
 
 	t.Run("output stdout", func(t *testing.T) {
-		var o = options{log: logrus.New()}
+		o := options{log: logrus.New()}
 
 		err := WithConfig(logger.Config{
 			Formatter: "json",
@@ -73,7 +73,7 @@ func Test_WithConfig_error(t *testing.T) {
 	})
 
 	t.Run("output stderr", func(t *testing.T) {
-		var o = options{log: logrus.New()}
+		o := options{log: logrus.New()}
 
 		err := WithConfig(logger.Config{
 			Formatter: "json",
@@ -84,7 +84,7 @@ func Test_WithConfig_error(t *testing.T) {
 	})
 
 	t.Run("output empty", func(t *testing.T) {
-		var o = options{log: logrus.New()}
+		o := options{log: logrus.New()}
 
 		err := WithConfig(logger.Config{
 			Formatter: "json",
@@ -96,20 +96,20 @@ func Test_WithConfig_error(t *testing.T) {
 
 func Test_WithLevel(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
-		var o = options{log: logrus.New()}
+		o := options{log: logrus.New()}
 		err := WithLevel(logger.LevelError)(&o)
 		require.NoError(t, err)
 		assert.Equal(t, logrus.ErrorLevel, o.log.Level)
 	})
 	t.Run("fail", func(t *testing.T) {
-		var o = options{log: logrus.New()}
+		o := options{log: logrus.New()}
 		err := WithLevel(logger.Level(42))(&o)
 		require.Error(t, err)
 	})
 }
 
 func Test_WithConsoleFormatter(t *testing.T) {
-	var o = options{log: logrus.New()}
+	o := options{log: logrus.New()}
 
 	err := WithConsoleFormatter(true)(&o)
 	require.NoError(t, err)
@@ -121,7 +121,7 @@ func Test_WithConsoleFormatter(t *testing.T) {
 }
 
 func Test_WithJSONFormatter(t *testing.T) {
-	var o = options{log: logrus.New()}
+	o := options{log: logrus.New()}
 	err := WithJSONFormatter()(&o)
 	require.NoError(t, err)
 	assert.IsType(t, new(logrus.JSONFormatter), o.log.Formatter)

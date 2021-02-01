@@ -9,7 +9,6 @@ type wrappedWriter struct {
 	logFunc func(...interface{})
 }
 
-// Write calls the underlying logger.
 func (ww *wrappedWriter) Write(p []byte) (int, error) {
 	p = bytes.TrimSpace(p)
 	ww.logFunc(string(p))
@@ -19,5 +18,5 @@ func (ww *wrappedWriter) Write(p []byte) (int, error) {
 // WriterLevel returns a writer that writes as if
 // LogAtLevelFunc(l) were called.
 func WriterLevel(l Logger, at Level) io.Writer {
-	return &wrappedWriter{LogAtLevelFunc(l, at)}
+	return &wrappedWriter{logFunc: LogAtLevelFunc(l, at)}
 }
